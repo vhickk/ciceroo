@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Skujy Tutorials / Ciceroo brand — teal + cyan */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+}
+
+:root {
+  --paper: #f7f8f9;
+  --ink: #0f172a;
+}
+
+html {
+  font-size: clamp(14px, 3.9vw, 16px);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 640px) {
+  html { font-size: 16px; }
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Thin, unobtrusive scrollbars for the horizontal course rails */
+.no-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+.no-scrollbar::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.12); border-radius: 999px; }
+.no-scrollbar::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(0, -18px) scale(1.04); }
+}
+.animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
