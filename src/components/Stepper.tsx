@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 
-const LABELS = ['Name', 'Course', 'UTME', 'O/Level', 'Results'];
+const LABELS = ['Name', 'Course', 'UTME', 'O/Level', 'Post-UTME', 'Results'];
 
 export function Stepper({ step }: { step: number }) {
   return (

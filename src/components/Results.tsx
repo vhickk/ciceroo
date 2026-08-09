@@ -49,29 +49,25 @@ export function Results({
   const band = BAND_STYLE[a.band];
   const eligible = a.utmeOk && a.olevelOk;
 
-  // Hero number + copy — no assumptions, just the required Post-UTME.
-  let big: string;
+  // Hero number + copy — the actual aggregate, measured against the cut-off.
+  const big = a.aggregate.toFixed(1);
+  const gap = a.margin !== null ? Math.abs(a.margin).toFixed(1) : '';
   let sub: string;
   if (a.merit <= 0) {
-    big = '?';
-    sub = `No current cut-off on record for ${prog.name}. Talk to us and we'll tell you the exact Post-UTME target.`;
-  } else if (a.band === 'secured') {
-    big = '0';
-    sub = `Your UTME + O/Level score already clears the ${a.cutLabel}. Any Post-UTME score keeps you in.`;
-  } else if (a.band === 'unreachable') {
-    big = '30+';
-    sub = `Even a perfect 30/30 would leave you ${(a.neededPostUtme! - 30).toFixed(1)} short of the ${a.cutLabel}. This course is out of reach on these scores.`;
+    sub = `No cut-off on record for ${prog.name} yet. Your aggregate is ${big} / 100 — talk to us to confirm this year's mark.`;
+  } else if (a.admitted) {
+    sub = `Your aggregate of ${big} clears the ${a.cutLabel} by ${gap} point${gap === '1.0' ? '' : 's'}. On these scores, you're in.`;
+  } else if (a.band === 'close') {
+    sub = `Your aggregate of ${big} is just ${gap} below the ${a.cutLabel}. It's a borderline case — supplementary lists can still fall your way.`;
   } else {
-    big = a.neededPostUtme!.toFixed(1);
-    sub = `Score at least this in your Post-UTME to reach the ${a.cutLabel}.`;
+    sub = `Your aggregate of ${big} is ${gap} below the ${a.cutLabel}. This course is out of reach on these scores — check the alternatives below.`;
   }
 
   // Path-to-admission bar segments (out of 100)
   const target = a.primaryCut ?? 0;
   const olevelW = a.olevelPts;
   const utmeW = a.utmeContrib;
-  const needW =
-    a.neededPostUtme && a.neededPostUtme > 0 ? Math.min(a.neededPostUtme, 30) : 0;
+  const postW = a.postUtmeContrib;
 
   return (
     <div className="space-y-8">
@@ -105,8 +101,8 @@ export function Results({
               <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
               <p className="text-sm font-semibold text-rose-700">
                 Your {!a.utmeOk ? 'UTME' : 'O/Level'} subject combination isn't correct for this
-                course yet. Fix it below — the Post-UTME target only counts once your combination
-                qualifies.
+                course — you can't be offered admission with the wrong combination, whatever your
+                aggregate. Fix it below.
               </p>
             </div>
           )}
@@ -116,16 +112,15 @@ export function Results({
               className={`rounded-[1.75rem] bg-gradient-to-br ${band.grad} px-8 py-7 text-center text-white shadow-2xl ${band.shadow}`}
             >
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
-                Post-UTME you need
+                Your aggregate
               </div>
               <div className="mt-1 text-6xl font-black leading-none tracking-tighter tabular-nums md:text-7xl">
                 {big}
-                {big !== '?' && <span className="text-2xl font-bold text-white/70"> /30</span>}
+                <span className="text-2xl font-bold text-white/70"> /100</span>
               </div>
-              <div
-                className={`mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]`}
-              >
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">
                 <Sparkles className="h-3 w-3" /> {band.label}
+                {a.primaryCut !== null && ` · cut-off ${a.primaryCut}`}
               </div>
             </div>
             <p className="max-w-md text-base font-medium leading-relaxed text-slate-600 md:text-lg">
@@ -135,19 +130,12 @@ export function Results({
         </div>
       </motion.div>
 
-      {/* ── PATH TO ADMISSION BAR ── */}
+      {/* ── AGGREGATE vs CUT-OFF BAR ── */}
       {a.merit > 0 && (
         <Card className="p-6 md:p-8">
-          <SectionLabel icon={Gauge}>Your path to the cut-off</SectionLabel>
+          <SectionLabel icon={Gauge}>Your aggregate against the cut-off</SectionLabel>
           <div className="relative mt-6 h-11 w-full overflow-hidden rounded-2xl bg-slate-100">
             <div className="flex h-full">
-              <div
-                className="flex h-full items-center justify-center bg-teal-500 text-[10px] font-black text-white"
-                style={{ width: `${olevelW}%` }}
-                title="O/Level"
-              >
-                {olevelW > 7 ? 'O/L' : ''}
-              </div>
               <div
                 className="flex h-full items-center justify-center bg-cyan-500 text-[10px] font-black text-white"
                 style={{ width: `${utmeW}%` }}
@@ -155,13 +143,20 @@ export function Results({
               >
                 {utmeW > 10 ? 'UTME' : ''}
               </div>
-              {needW > 0 && (
+              <div
+                className="flex h-full items-center justify-center bg-violet-500 text-[10px] font-black text-white"
+                style={{ width: `${olevelW}%` }}
+                title="O/Level"
+              >
+                {olevelW > 7 ? 'O/L' : ''}
+              </div>
+              {postW > 0 && (
                 <div
-                  className="flex h-full items-center justify-center bg-amber-400 bg-[repeating-linear-gradient(45deg,transparent,transparent_6px,rgba(255,255,255,0.35)_6px,rgba(255,255,255,0.35)_12px)] text-[10px] font-black text-amber-900"
-                  style={{ width: `${needW}%` }}
-                  title="Post-UTME needed"
+                  className="flex h-full items-center justify-center bg-teal-500 text-[10px] font-black text-white"
+                  style={{ width: `${postW}%` }}
+                  title="Post-UTME"
                 >
-                  {needW > 8 ? 'Post-UTME' : ''}
+                  {postW > 8 ? 'Post-UTME' : ''}
                 </div>
               )}
             </div>
@@ -176,9 +171,9 @@ export function Results({
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold text-slate-500">
-            <Legend color="bg-teal-500" label={`O/Level ${a.olevelPts.toFixed(1)}`} />
             <Legend color="bg-cyan-500" label={`UTME ${a.utmeContrib.toFixed(1)}`} />
-            {needW > 0 && <Legend color="bg-amber-400" label={`Post-UTME ${needW.toFixed(1)}`} />}
+            <Legend color="bg-violet-500" label={`O/Level ${a.olevelPts.toFixed(1)}`} />
+            <Legend color="bg-teal-500" label={`Post-UTME ${a.postUtmeContrib.toFixed(1)}`} />
           </div>
         </Card>
       )}
@@ -188,9 +183,9 @@ export function Results({
         <StatTile
           icon={Award}
           tone="teal"
-          label="Score so far"
-          value={`${a.scored.toFixed(1)}`}
-          sub="out of 70 (pre Post-UTME)"
+          label="Aggregate"
+          value={a.aggregate.toFixed(1)}
+          sub="out of 100"
           delay={0.05}
         />
         <StatTile
@@ -210,11 +205,11 @@ export function Results({
           delay={0.15}
         />
         <StatTile
-          icon={MapPin}
-          tone={a.catchmentScore !== null ? 'emerald' : 'slate'}
-          label={a.catchmentScore !== null ? `${input.stateOfOrigin} cut-off` : 'Merit cut-off'}
-          value={a.merit > 0 ? (a.catchmentScore ?? a.merit) : '—'}
-          sub={a.merit > 0 ? `merit ${a.merit}` : 'no data'}
+          icon={Target}
+          tone={a.admitted ? 'emerald' : 'rose'}
+          label="Post-UTME"
+          value={a.postUtmeContrib.toFixed(1)}
+          sub={a.primaryCut !== null ? `cut-off ${a.primaryCut} / 100` : 'no cut-off data'}
           delay={0.2}
         />
       </div>

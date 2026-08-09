@@ -18,6 +18,7 @@ export interface StudentInput {
   utmeScore: string;
   utmeSubjects: string[]; // up to 4
   stateOfOrigin: string; // "Lagos" | ... | "Other" | ""
+  postUtme: string; // Post-UTME (screening) score, out of 30
   programmeName?: string; // the currently chosen programme (excluded from suggestions)
 }
 
@@ -142,14 +143,13 @@ export function checkUTMESubjects(
   return { valid: missing.length === 0, missing };
 }
 
-// ── Central per-programme analysis (assumption-free Post-UTME target) ─────
+// ── Central per-programme analysis (actual aggregate vs cut-off) ──────────
 export type Band =
-  | 'secured' // already clears the cut-off, 0 Post-UTME needed
-  | 'strong' // low Post-UTME needed
-  | 'reachable' // moderate Post-UTME needed
-  | 'stretch' // high Post-UTME needed but < 30
-  | 'unreachable' // even 30/30 falls short
-  | 'unknown'; // no cut-off data
+  | 'admitted' // aggregate clears the cut-off
+  | 'close' // just below (within 3 aggregate points)
+  | 'below' // below the cut-off
+  | 'far' // well below the cut-off
+  | 'unknown'; // no cut-off data on record
 
 export type Chance = 'high' | 'med' | 'low' | 'none' | 'unknown';
 
@@ -157,12 +157,15 @@ export interface Analysis {
   prog: Programme;
   utmeContrib: number; // /50
   olevelPts: number; // /20
-  scored: number; // /70 (UTME + O/Level, no Post-UTME)
+  postUtmeContrib: number; // /30
+  scored: number; // /70 (UTME + O/Level, pre Post-UTME)
+  aggregate: number; // /100 (UTME + O/Level + Post-UTME)
   merit: number;
   catchmentScore: number | null;
   primaryCut: number | null; // the easier of merit / catchment
   cutLabel: string;
-  neededPostUtme: number | null; // /30 required (may exceed 30 => unreachable)
+  margin: number | null; // aggregate − cut-off (null if no cut-off data)
+  admitted: boolean; // aggregate clears the cut-off
   band: Band;
   chance: Chance;
   utmeOk: boolean;
@@ -172,11 +175,10 @@ export interface Analysis {
 }
 
 const bandToChance: Record<Band, Chance> = {
-  secured: 'high',
-  strong: 'high',
-  reachable: 'med',
-  stretch: 'low',
-  unreachable: 'none',
+  admitted: 'high',
+  close: 'med',
+  below: 'low',
+  far: 'none',
   unknown: 'unknown',
 };
 
@@ -188,6 +190,7 @@ export function analyseProgramme(
 ): Analysis {
   const utme = parseFloat(input.utmeScore) || 0;
   const utmeContrib = Math.min(utme / 8, 50);
+  const postUtmeContrib = Math.max(0, Math.min(parseFloat(input.postUtme) || 0, 30));
 
   const olevelCheck =
     studentResults.length >= 5 ? findBestFive(studentResults, prog.requirements) : null;
@@ -195,6 +198,7 @@ export function analyseProgramme(
     olevelPtsOverride ??
     (olevelCheck && olevelCheck.valid ? olevelCheck.totalPoints! : 0);
   const scored = utmeContrib + olevelPts;
+  const aggregate = +(scored + postUtmeContrib).toFixed(2);
 
   const catchmentScore =
     input.stateOfOrigin &&
@@ -208,7 +212,7 @@ export function analyseProgramme(
 
   let primaryCut: number | null = null;
   let cutLabel = '';
-  let neededPostUtme: number | null = null;
+  let margin: number | null = null;
   let band: Band = 'unknown';
 
   if (merit > 0) {
@@ -218,24 +222,26 @@ export function analyseProgramme(
       catchmentScore !== null && catchmentScore < merit
         ? `${input.stateOfOrigin} catchment (${catchmentScore})`
         : `merit cut-off (${merit})`;
-    neededPostUtme = +(primaryCut - scored).toFixed(2);
-    if (neededPostUtme <= 0) band = 'secured';
-    else if (neededPostUtme > 30) band = 'unreachable';
-    else if (neededPostUtme <= 15) band = 'strong';
-    else if (neededPostUtme <= 24) band = 'reachable';
-    else band = 'stretch';
+    margin = +(aggregate - primaryCut).toFixed(2);
+    if (margin >= 0) band = 'admitted';
+    else if (margin >= -3) band = 'close';
+    else if (margin >= -10) band = 'below';
+    else band = 'far';
   }
 
   return {
     prog,
     utmeContrib,
     olevelPts,
+    postUtmeContrib,
     scored,
+    aggregate,
     merit,
     catchmentScore,
     primaryCut,
     cutLabel,
-    neededPostUtme,
+    margin,
+    admitted: margin !== null && margin >= 0,
     band,
     chance: bandToChance[band],
     utmeOk: utmeCheck.valid,
@@ -249,8 +255,9 @@ export function analyseProgramme(
 export interface AltItem {
   prog: Programme;
   olevelPts: number;
-  scored: number;
-  neededPostUtme: number | null;
+  aggregate: number;
+  margin: number | null;
+  admitted: boolean;
   band: Band;
   chance: Chance;
 }
@@ -282,8 +289,9 @@ export function findAlternativeProgrammes(
     items.push({
       prog,
       olevelPts: res.totalPoints!,
-      scored: a.scored,
-      neededPostUtme: a.neededPostUtme,
+      aggregate: a.aggregate,
+      margin: a.margin,
+      admitted: a.admitted,
       band: a.band,
       chance: a.chance,
     });
@@ -305,14 +313,14 @@ export function findAlternativeProgrammes(
     grouped[fac].sort(
       (a, b) =>
         chanceOrder[a.chance] - chanceOrder[b.chance] ||
-        (a.neededPostUtme ?? 99) - (b.neededPostUtme ?? 99),
+        (b.margin ?? -999) - (a.margin ?? -999),
     );
   }
 
   const sortedFaculties = Object.keys(grouped).sort((a, b) => {
-    const aHigh = grouped[a].filter((r) => r.chance === 'high').length;
-    const bHigh = grouped[b].filter((r) => r.chance === 'high').length;
-    return bHigh - aHigh || grouped[b].length - grouped[a].length;
+    const aIn = grouped[a].filter((r) => r.admitted).length;
+    const bIn = grouped[b].filter((r) => r.admitted).length;
+    return bIn - aIn || grouped[b].length - grouped[a].length;
   });
 
   return { grouped, sortedFaculties, total: items.length };

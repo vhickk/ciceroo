@@ -6,6 +6,7 @@ import {
   StepProgramme,
   StepUTME,
   StepOLevel,
+  StepPostUtme,
   type OlevelRow,
 } from './components/Steps';
 import { Results } from './components/Results';
@@ -25,6 +26,7 @@ export default function App() {
   const [utmeSubjects, setUtmeSubjects] = useState<string[]>(['', '', '', '']);
   const [olevel, setOlevel] = useState<OlevelRow[]>(EMPTY_OLEVEL);
   const [stateOfOrigin, setStateOfOrigin] = useState('');
+  const [postUtme, setPostUtme] = useState('');
   const [exploring, setExploring] = useState(false);
 
   const studentResults: OlevelEntry[] = useMemo(
@@ -40,8 +42,8 @@ export default function App() {
   );
 
   const input: StudentInput = useMemo(
-    () => ({ utmeScore, utmeSubjects, stateOfOrigin, programmeName }),
-    [utmeScore, utmeSubjects, stateOfOrigin, programmeName],
+    () => ({ utmeScore, utmeSubjects, stateOfOrigin, postUtme, programmeName }),
+    [utmeScore, utmeSubjects, stateOfOrigin, postUtme, programmeName],
   );
 
   const go = (n: number) => {
@@ -56,6 +58,7 @@ export default function App() {
     setUtmeSubjects(['', '', '', '']);
     setOlevel(EMPTY_OLEVEL);
     setStateOfOrigin('');
+    setPostUtme('');
     setExploring(false);
     go(0);
   };
@@ -67,7 +70,7 @@ export default function App() {
 
   return (
     <AppShell>
-      {step < 4 && <Stepper step={step} />}
+      {step < 5 && <Stepper step={step} />}
 
       {step === 0 && (
         <StepName value={name} onChange={setName} onNext={() => go(1)} />
@@ -101,7 +104,15 @@ export default function App() {
           onBack={() => go(2)}
         />
       )}
-      {step === 4 &&
+      {step === 4 && (
+        <StepPostUtme
+          score={postUtme}
+          onScore={setPostUtme}
+          onNext={() => go(5)}
+          onBack={() => go(3)}
+        />
+      )}
+      {step === 5 &&
         (exploring ? (
           <Alternatives
             name={name}
@@ -114,7 +125,7 @@ export default function App() {
             name={name}
             input={input}
             studentResults={studentResults}
-            onEdit={() => go(3)}
+            onEdit={() => go(4)}
             onRestart={restart}
             onExplore={() => explore(true)}
           />

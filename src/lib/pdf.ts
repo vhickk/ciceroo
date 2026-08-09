@@ -12,11 +12,10 @@ import type { AltItem } from './scoring';
 const facShort = (f: string) => f.replace('Faculty of ', '').replace('College of ', '');
 
 const BAND_PDF: Record<Band, { label: string; rgb: [number, number, number] }> = {
-  secured: { label: 'Already in', rgb: [5, 150, 105] },
-  strong: { label: 'Strong shot', rgb: [13, 148, 136] },
-  reachable: { label: 'Reachable', rgb: [8, 145, 178] },
-  stretch: { label: 'A stretch', rgb: [217, 119, 6] },
-  unreachable: { label: 'Out of reach', rgb: [220, 38, 38] },
+  admitted: { label: "You're in", rgb: [5, 150, 105] },
+  close: { label: 'On the border', rgb: [217, 119, 6] },
+  below: { label: 'Below cut-off', rgb: [234, 88, 12] },
+  far: { label: 'Well below', rgb: [220, 38, 38] },
   unknown: { label: 'Confirm cut-off', rgb: [100, 116, 139] },
 };
 
@@ -48,13 +47,13 @@ export function generatePDF(
   const utme = parseFloat(input.utmeScore) || 0;
   const utmeContrib = a.utmeContrib;
   const olevelContrib = a.olevelPts;
-  const scored = a.scored;
+  const postUtmeContrib = a.postUtmeContrib;
+  const aggregate = a.aggregate;
   const merit = a.merit;
   const catchmentScore = a.catchmentScore;
   const cutoff = a.primaryCut ?? merit;
-  const neededPostUtme = a.neededPostUtme ?? 0;
+  const margin = a.margin ?? 0;
   const subjectIneligible = !a.utmeOk || !a.olevelOk;
-  const scoresTooLow = !subjectIneligible && a.band === 'unreachable';
 
   const W = 210; // A4 width mm
   let y = 0;
@@ -121,7 +120,8 @@ export function generatePDF(
   const rows: [string, string, string][] = [
     ['UTME Score', `${utme} / 400`, `Contribution: ${utmeContrib.toFixed(2)} / 50`],
     ['O/Level Best 5', `${olevelContrib.toFixed(2)} / 20`, `Based on ${Math.min(filledOlevel.length, 5)} subjects`],
-    ['UTME + O/Level Combined', `${scored.toFixed(2)} / 70`, ''],
+    ['Post-UTME Score', `${postUtmeContrib.toFixed(2)} / 30`, ''],
+    ['Aggregate', `${aggregate.toFixed(2)} / 100`, ''],
   ];
   doc.setFontSize(8.5);
   for (const [label, val, note] of rows) {
@@ -150,10 +150,11 @@ export function generatePDF(
   ];
   if (catchmentScore !== null)
     cutoffRows.push([`${input.stateOfOrigin} Catchment Cut-off`, `${catchmentScore}`]);
-  cutoffRows.push(['Effective Cut-off Applied', cutoff > 0 ? `${cutoff}` : 'No data']);
+  cutoffRows.push(['Effective Cut-off Applied', cutoff > 0 ? `${cutoff} / 100` : 'No data']);
+  cutoffRows.push(['Your Aggregate', `${aggregate.toFixed(2)} / 100`]);
   cutoffRows.push([
-    'Required Post-UTME Score',
-    merit > 0 && !subjectIneligible ? `${Math.max(neededPostUtme, 0).toFixed(2)} / 30` : 'N/A',
+    'Margin vs Cut-off',
+    merit > 0 ? `${margin >= 0 ? '+' : ''}${margin.toFixed(2)}` : 'N/A',
   ]);
   for (const [label, val] of cutoffRows) {
     doc.setFont('helvetica', 'bold');
@@ -202,15 +203,15 @@ export function generatePDF(
   if (subjectIneligible) {
     verdictText = 'WRONG SUBJECT COMBINATION';
     verdictColor = [220, 38, 38];
-  } else if (scoresTooLow) {
-    verdictText = 'SCORES TOO LOW';
-    verdictColor = [220, 38, 38];
-  } else if (neededPostUtme <= 0) {
-    verdictText = 'ALREADY BEATS CUT-OFF';
+  } else if (merit <= 0) {
+    verdictText = `AGGREGATE ${aggregate.toFixed(1)} / 100  |  NO CUT-OFF ON RECORD`;
+    verdictColor = [100, 116, 139];
+  } else if (a.admitted) {
+    verdictText = `ADMITTED  |  ${aggregate.toFixed(1)} vs ${cutoff} (+${margin.toFixed(1)})`;
     verdictColor = [5, 150, 105];
   } else {
-    verdictText = `NEEDS ${neededPostUtme.toFixed(1)}/30 IN POST-UTME`;
-    verdictColor = neededPostUtme <= 22 ? [5, 150, 105] : [217, 119, 6];
+    verdictText = `BELOW CUT-OFF  |  ${aggregate.toFixed(1)} vs ${cutoff} (${margin.toFixed(1)})`;
+    verdictColor = margin >= -3 ? [217, 119, 6] : [220, 38, 38];
   }
   doc.setFillColor(...verdictColor);
   doc.roundedRect(14, y, W - 28, 12, 3, 3, 'F');
@@ -319,6 +320,7 @@ export function generateFacultyPDF(
   // ── Student name row ──
   const utme = parseFloat(input.utmeScore) || 0;
   const utmeContrib = Math.min(utme / 8, 50);
+  const postUtmeContrib = Math.max(0, Math.min(parseFloat(input.postUtme) || 0, 30));
   // Requirement-matched best five: the actual subjects that satisfy the
   // faculty's strongest course (real subject for every slot, incl. "any"
   // requirements — so the combination shown is what UNILAG actually counts).
@@ -335,7 +337,7 @@ export function generateFacultyPDF(
     bestFive && bestFive.valid && bestFive.totalPoints != null
       ? bestFive.totalPoints
       : best5.reduce((s, r) => s + r.points, 0);
-  const aggregate = utmeContrib + olevelPts;
+  const aggregate = utmeContrib + olevelPts + postUtmeContrib;
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
@@ -407,11 +409,15 @@ export function generateFacultyPDF(
   const naw = doc.getTextWidth(aggStr);
   doc.setFontSize(10);
   doc.setTextColor(148, 163, 184);
-  doc.text('/ 70', 136 + naw + 2, 78);
+  doc.text('/ 100', 136 + naw + 2, 78);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(7);
   doc.setTextColor(120, 130, 145);
-  doc.text(`UTME ${utmeContrib.toFixed(1)}   +   O'Level ${olevelPts.toFixed(1)}`, 136, 85);
+  doc.text(
+    `UTME ${utmeContrib.toFixed(1)} + O'Level ${olevelPts.toFixed(1)} + Post ${postUtmeContrib.toFixed(1)}`,
+    136,
+    85,
+  );
 
   // ── Faculty title ──
   let y = 98;
@@ -442,14 +448,7 @@ export function generateFacultyPDF(
     const accent = COURSE_PDF[i % COURSE_PDF.length];
     const bandInfo = BAND_PDF[it.band];
     const a: Analysis = analyseProgramme(it.prog, input, studentResults);
-    const bigNum =
-      it.band === 'secured'
-        ? '0'
-        : it.band === 'unreachable'
-          ? '30+'
-          : it.neededPostUtme !== null
-            ? it.neededPostUtme.toFixed(1)
-            : '-';
+    const bigNum = it.aggregate.toFixed(1);
     const cut = a.primaryCut !== null ? `${a.primaryCut}` : a.merit > 0 ? `${a.merit}` : '-';
 
     // accent card behind → coloured tip; white body over it leaves a strip
@@ -480,18 +479,18 @@ export function generateFacultyPDF(
     doc.text(nameLines[0], px, cy + 22);
     if (nameLines[1]) doc.text(nameLines[1], px, cy + 27.5);
 
-    // Post-UTME headline
+    // aggregate headline
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
     doc.setTextColor(148, 163, 184);
-    doc.text('POST-UTME NEEDED', px, cy + 37);
+    doc.text('YOUR AGGREGATE', px, cy + 37);
     doc.setFontSize(19);
     doc.setTextColor(...accent);
     doc.text(bigNum, px, cy + 44.5);
     const nw = doc.getTextWidth(bigNum);
     doc.setFontSize(9);
     doc.setTextColor(160, 170, 185);
-    doc.text('/ 30', px + nw + 1.6, cy + 44.5);
+    doc.text('/ 100', px + nw + 1.6, cy + 44.5);
 
     // cut-off, bottom-right
     doc.setFont('helvetica', 'normal');

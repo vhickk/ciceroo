@@ -30,21 +30,17 @@ import { Card } from './ui';
 import { CombinationCheck } from './ComboCheck';
 import { generateFacultyPDF } from '../lib/pdf';
 
-// ── Post-UTME headline copy, shared by course card + detail ───────────────
-function postUtme(a: Analysis): { big: string; sub: string } {
+// ── Aggregate headline copy, shared by course card + detail ───────────────
+function aggCopy(a: Analysis): { big: string; sub: string } {
+  const big = a.aggregate.toFixed(1);
   if (a.merit <= 0)
-    return { big: '?', sub: 'No cut-off on record — talk to us for the exact target.' };
-  if (a.band === 'secured')
-    return { big: '0', sub: `You already clear the ${a.cutLabel}.` };
-  if (a.band === 'unreachable')
-    return {
-      big: '30+',
-      sub: `Even 30/30 falls ${(a.neededPostUtme! - 30).toFixed(1)} short of the ${a.cutLabel}.`,
-    };
-  return {
-    big: a.neededPostUtme!.toFixed(1),
-    sub: `Score at least this in Post-UTME to reach the ${a.cutLabel}.`,
-  };
+    return { big, sub: `Aggregate ${big} / 100 — no cut-off on record yet.` };
+  const gap = Math.abs(a.margin ?? 0).toFixed(1);
+  if (a.admitted)
+    return { big, sub: `${big} clears the ${a.cutLabel} by ${gap}. You're in.` };
+  if (a.band === 'close')
+    return { big, sub: `${big} — just ${gap} below the ${a.cutLabel}. Borderline.` };
+  return { big, sub: `${big} — ${gap} below the ${a.cutLabel}.` };
 }
 
 const slide = {
@@ -225,7 +221,7 @@ function FacultiesView({
           const Icon = meta.icon;
           const paint = coursePaint(i);
           const items = grouped[fac];
-          const high = items.filter((it) => it.chance === 'high').length;
+          const high = items.filter((it) => it.admitted).length;
           return (
             <motion.div
               key={fac}
@@ -262,7 +258,7 @@ function FacultiesView({
                   </span>
                   {high > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-emerald-600 ring-1 ring-emerald-100">
-                      <Sparkles className="h-3.5 w-3.5" /> {high} strong
+                      <Sparkles className="h-3.5 w-3.5" /> {high} you're in
                     </span>
                   )}
                 </div>
@@ -351,14 +347,7 @@ function CoursesView({
           const paint = coursePaint(i);
           const chance = CHANCE_STYLE[it.chance];
           const WIcon = facultyMeta(it.prog.faculty).icon;
-          const big =
-            it.band === 'secured'
-              ? '0'
-              : it.band === 'unreachable'
-                ? '30+'
-                : it.neededPostUtme !== null
-                  ? it.neededPostUtme.toFixed(1)
-                  : '?';
+          const big = it.aggregate.toFixed(1);
           return (
             <motion.button
               key={it.prog.name}
@@ -400,13 +389,11 @@ function CoursesView({
                   <div className="mt-3 flex items-end justify-between">
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
-                        Post-UTME needed
+                        Your aggregate
                       </div>
                       <div className={`text-4xl font-black leading-none tracking-tighter tabular-nums ${paint.tintText}`}>
                         {big}
-                        {big !== '?' && (
-                          <span className="text-lg font-bold text-slate-400"> /30</span>
-                        )}
+                        <span className="text-lg font-bold text-slate-400"> /100</span>
                       </div>
                     </div>
                     <span
@@ -441,7 +428,7 @@ function DetailView({
   const meta = facultyMeta(prog.faculty);
   const FacIcon = meta.icon;
   const band = BAND_STYLE[a.band];
-  const { big, sub } = postUtme(a);
+  const { big, sub } = aggCopy(a);
 
   return (
     <div className="space-y-6">
@@ -472,14 +459,15 @@ function DetailView({
               className={`rounded-[1.75rem] bg-gradient-to-br ${band.grad} px-8 py-7 text-center text-white shadow-2xl ${band.shadow}`}
             >
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
-                Post-UTME you need
+                Your aggregate
               </div>
               <div className="mt-1 text-6xl font-black leading-none tracking-tighter tabular-nums">
                 {big}
-                {big !== '?' && <span className="text-2xl font-bold text-white/70"> /30</span>}
+                <span className="text-2xl font-bold text-white/70"> /100</span>
               </div>
               <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">
                 <Sparkles className="h-3 w-3" /> {band.label}
+                {a.primaryCut !== null && ` · cut-off ${a.primaryCut}`}
               </div>
             </div>
             <p className="max-w-md text-base font-medium leading-relaxed text-slate-600">
@@ -499,7 +487,8 @@ function DetailView({
         </div>
         <Row label="UTME contribution" value={`${a.utmeContrib.toFixed(1)} / 50`} />
         <Row label="O/Level best-5" value={`${a.olevelPts.toFixed(1)} / 20`} />
-        <Row label="Your score so far" value={`${a.scored.toFixed(1)} / 70`} />
+        <Row label="Post-UTME" value={`${a.postUtmeContrib.toFixed(1)} / 30`} />
+        <Row label="Your aggregate" value={`${a.aggregate.toFixed(1)} / 100`} />
         <Row label="Merit cut-off" value={a.merit > 0 ? `${a.merit}` : 'No data'} />
         {a.catchmentScore !== null && (
           <Row label={`${input.stateOfOrigin} catchment`} value={`${a.catchmentScore}`} last />

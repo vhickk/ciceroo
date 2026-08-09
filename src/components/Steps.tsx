@@ -113,8 +113,8 @@ export function StepName({
           transition={{ duration: 0.55, delay: 0.12 }}
           className="mx-auto mt-5 max-w-lg text-base font-medium leading-relaxed text-slate-500 sm:text-lg"
         >
-          Enter your details and get the exact Post-UTME score you need — before you ever sit the
-          exam. Powered by official 2025/2026 UNILAG cut-offs.
+          Enter your UTME, O'Level and Post-UTME scores to see your exact UNILAG aggregate — and
+          whether you're in, measured against the official 2025/2026 cut-offs.
         </motion.p>
 
         {/* name input + popping CTA */}
@@ -158,7 +158,7 @@ export function StepName({
           transition={{ duration: 0.55, delay: 0.24 }}
           className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
         >
-          {['Free to use', 'No sign-up', 'Exact Post-UTME target', 'Instant results'].map((item) => (
+          {['Free to use', 'No sign-up', 'Your exact aggregate', 'Instant verdict'].map((item) => (
             <li key={item} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
               <CheckCircle2 className="h-3.5 w-3.5 text-teal-500" /> {item}
             </li>
@@ -435,7 +435,7 @@ export function StepOLevel({
 
   return (
     <StepFrame
-      eyebrow="Step 4 — almost there"
+      eyebrow="Step 4"
       title="Your O/Level results"
       subtitle="Enter at least 5 subjects with grades. We'll pick your best-five combination automatically."
     >
@@ -530,6 +530,60 @@ export function StepOLevel({
           <ArrowLeft className="h-4 w-4" /> Back
         </GhostButton>
         <PrimaryButton onClick={onNext} disabled={!canContinue}>
+          Continue <ArrowRight className="h-4 w-4" />
+        </PrimaryButton>
+      </div>
+    </StepFrame>
+  );
+}
+
+// ── Step 5: Post-UTME ─────────────────────────────────────────────────────
+export function StepPostUtme({
+  score,
+  onScore,
+  onNext,
+  onBack,
+}: {
+  score: string;
+  onScore: (v: string) => void;
+  onNext: () => void;
+  onBack: () => void;
+}) {
+  const n = parseFloat(score);
+  const valid = score !== '' && !isNaN(n) && n >= 0 && n <= 30;
+
+  return (
+    <StepFrame
+      eyebrow="Step 5 — last one"
+      title="Your Post-UTME score"
+      subtitle="Enter your UNILAG Post-UTME (screening) result, out of 30. We'll work out your final aggregate and whether you're in."
+    >
+      <Card className="p-6 md:p-8">
+        <label className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">
+          <Hash className="h-4 w-4" /> Post-UTME score (out of 30)
+        </label>
+        <input
+          autoFocus
+          inputMode="decimal"
+          value={score}
+          onChange={(e) => onScore(e.target.value.replace(/[^0-9.]/g, ''))}
+          onKeyDown={(e) => e.key === 'Enter' && valid && onNext()}
+          placeholder="e.g. 24"
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-5 py-4 text-2xl font-black tracking-tight text-slate-900 outline-none transition placeholder:text-slate-300 focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
+        />
+        {score && !valid && (
+          <p className="mt-2 text-xs font-bold text-rose-500">Score must be between 0 and 30.</p>
+        )}
+        <p className="mt-3 text-xs font-medium text-slate-400">
+          This is your actual screening score — not a prediction. We add it to your UTME and
+          O/Level points for your aggregate out of 100.
+        </p>
+      </Card>
+      <div className="mt-6 flex items-center justify-between">
+        <GhostButton onClick={onBack}>
+          <ArrowLeft className="h-4 w-4" /> Back
+        </GhostButton>
+        <PrimaryButton onClick={onNext} disabled={!valid}>
           See my results <ArrowRight className="h-4 w-4" />
         </PrimaryButton>
       </div>

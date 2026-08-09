@@ -56,8 +56,8 @@ export interface BandStyle {
 }
 
 export const BAND_STYLE: Record<Band, BandStyle> = {
-  secured: {
-    label: "You're already in",
+  admitted: {
+    label: "You're in",
     grad: 'from-emerald-500 to-teal-500',
     chip: 'bg-emerald-50 text-emerald-700',
     text: 'text-emerald-600',
@@ -65,26 +65,8 @@ export const BAND_STYLE: Record<Band, BandStyle> = {
     shadow: 'shadow-emerald-500/30',
     blob: 'bg-emerald-400/20',
   },
-  strong: {
-    label: 'Strong shot',
-    grad: 'from-teal-500 to-cyan-500',
-    chip: 'bg-teal-50 text-teal-700',
-    text: 'text-teal-600',
-    ring: 'border-teal-100',
-    shadow: 'shadow-teal-500/30',
-    blob: 'bg-teal-400/20',
-  },
-  reachable: {
-    label: 'Reachable',
-    grad: 'from-cyan-500 to-sky-500',
-    chip: 'bg-cyan-50 text-cyan-700',
-    text: 'text-cyan-600',
-    ring: 'border-cyan-100',
-    shadow: 'shadow-cyan-500/30',
-    blob: 'bg-cyan-400/20',
-  },
-  stretch: {
-    label: 'A stretch',
+  close: {
+    label: 'On the border',
     grad: 'from-amber-500 to-orange-500',
     chip: 'bg-amber-50 text-amber-700',
     text: 'text-amber-600',
@@ -92,8 +74,17 @@ export const BAND_STYLE: Record<Band, BandStyle> = {
     shadow: 'shadow-amber-500/30',
     blob: 'bg-amber-400/20',
   },
-  unreachable: {
-    label: 'Out of reach',
+  below: {
+    label: 'Below cut-off',
+    grad: 'from-orange-500 to-rose-500',
+    chip: 'bg-orange-50 text-orange-700',
+    text: 'text-orange-600',
+    ring: 'border-orange-100',
+    shadow: 'shadow-orange-500/30',
+    blob: 'bg-orange-400/20',
+  },
+  far: {
+    label: 'Well below',
     grad: 'from-rose-500 to-red-500',
     chip: 'bg-rose-50 text-rose-700',
     text: 'text-rose-600',
@@ -140,9 +131,9 @@ export function coursePaint(i: number): CoursePaint {
 }
 
 export const CHANCE_STYLE: Record<Chance, { label: string; chip: string; dot: string }> = {
-  high: { label: 'High', chip: 'bg-emerald-50 text-emerald-700 ring-emerald-100', dot: 'bg-emerald-400' },
-  med: { label: 'Medium', chip: 'bg-amber-50 text-amber-700 ring-amber-100', dot: 'bg-amber-400' },
-  low: { label: 'Stretch', chip: 'bg-rose-50 text-rose-700 ring-rose-100', dot: 'bg-rose-400' },
-  none: { label: 'Out of reach', chip: 'bg-slate-100 text-slate-600 ring-slate-200', dot: 'bg-slate-400' },
+  high: { label: 'Admitted', chip: 'bg-emerald-50 text-emerald-700 ring-emerald-100', dot: 'bg-emerald-400' },
+  med: { label: 'Borderline', chip: 'bg-amber-50 text-amber-700 ring-amber-100', dot: 'bg-amber-400' },
+  low: { label: 'Below', chip: 'bg-orange-50 text-orange-700 ring-orange-100', dot: 'bg-orange-400' },
+  none: { label: 'Well below', chip: 'bg-rose-50 text-rose-700 ring-rose-100', dot: 'bg-rose-400' },
   unknown: { label: 'No data', chip: 'bg-slate-100 text-slate-600 ring-slate-200', dot: 'bg-slate-400' },
 };
