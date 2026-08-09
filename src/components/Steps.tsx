@@ -368,9 +368,7 @@ export function StepUTME({
                 onChange={(e) => setSubject(i, e.target.value)}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
               >
-                <option value="">
-                  {i === 0 ? 'English Language' : `Subject ${i + 1}`}…
-                </option>
+                <option value="">Subject {i + 1}…</option>
                 {SUBJECTS.map((sub) => (
                   <option key={sub} value={sub}>
                     {sub}

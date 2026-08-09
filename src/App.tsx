@@ -23,7 +23,13 @@ export default function App() {
   const [name, setName] = useState('');
   const [programmeName, setProgrammeName] = useState('');
   const [utmeScore, setUtmeScore] = useState('');
-  const [utmeSubjects, setUtmeSubjects] = useState<string[]>(['', '', '', '']);
+  // UTME always includes English, so it's pre-selected in the first slot.
+  const [utmeSubjects, setUtmeSubjects] = useState<string[]>([
+    'English Language',
+    '',
+    '',
+    '',
+  ]);
   const [olevel, setOlevel] = useState<OlevelRow[]>(EMPTY_OLEVEL);
   const [stateOfOrigin, setStateOfOrigin] = useState('');
   const [postUtme, setPostUtme] = useState('');
@@ -55,7 +61,7 @@ export default function App() {
     setName('');
     setProgrammeName('');
     setUtmeScore('');
-    setUtmeSubjects(['', '', '', '']);
+    setUtmeSubjects(['English Language', '', '', '']);
     setOlevel(EMPTY_OLEVEL);
     setStateOfOrigin('');
     setPostUtme('');
