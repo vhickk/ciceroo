@@ -1,8 +1,22 @@
 import { Check, X, BookOpenCheck, ClipboardCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { Programme } from '../data/programmes';
+import type { Programme, ReqGroup } from '../data/programmes';
 import type { Analysis, OlevelEntry, StudentInput } from '../lib/scoring';
 import { Card } from './ui';
+
+// How UNILAG's requirement for one group reads — the requirement itself, never
+// the student's own pick (a flexible slot is "N electives" / a choice from a
+// pool, not whatever subject the student happened to use for it).
+function requirementLabel(g: ReqGroup): string {
+  if (g.subjects.includes('__ANY__'))
+    return `${g.count} free elective${g.count > 1 ? 's' : ''}`;
+  // a fixed, fully-required set (e.g. a single named subject)
+  if (g.count >= g.subjects.length) return g.subjects.join(' + ');
+  // choose N from a larger pool — show the real options, capped for length
+  const shown = g.subjects.slice(0, 5).join(' / ');
+  const more = g.subjects.length > 5 ? ` +${g.subjects.length - 5} more` : '';
+  return `${g.count} of: ${shown}${more}`;
+}
 
 // ── Stylish pass/fail badge ───────────────────────────────────────────────
 function Mark({ ok }: { ok: boolean }) {
@@ -159,30 +173,22 @@ export function CombinationCheck({
         ),
   }));
 
-  // UTME ── requirement groups (right): show the ACTUAL subjects the student
-  // uses to satisfy each group — never a vague "any". When a group isn't met,
-  // show the concrete options / how many more are needed.
+  // UTME ── UNILAG's requirement per group (right). Label is the requirement
+  // itself; the ✓/✗ comes from allocating the student's subjects to each group.
   let utmeRight: Row[];
   if (utmeReqs) {
     const usedU = new Set<number>();
     utmeRight = utmeReqs.map((g) => {
       const isAny = g.subjects.includes('__ANY__');
-      const picked: string[] = [];
-      for (let i = 0; i < filledUtme.length && picked.length < g.count; i++) {
+      let filled = 0;
+      for (let i = 0; i < filledUtme.length && filled < g.count; i++) {
         if (usedU.has(i)) continue;
         if (isAny || g.subjects.includes(filledUtme[i])) {
           usedU.add(i);
-          picked.push(filledUtme[i]);
+          filled++;
         }
       }
-      const ok = picked.length >= g.count;
-      const need = g.count - picked.length;
-      const label = ok
-        ? picked.join(' + ')
-        : isAny
-          ? `${need} more subject${need > 1 ? 's' : ''}`
-          : `${g.subjects.join(' / ')}${g.count > 1 ? ` (need ${g.count})` : ''}`;
-      return { label, ok };
+      return { label: requirementLabel(g), ok: filled >= g.count };
     });
   } else {
     utmeRight = prog.utme.map((r) => {
@@ -194,7 +200,7 @@ export function CombinationCheck({
             s.toLowerCase().includes(r.toLowerCase()) ||
             r.toLowerCase().includes(s.toLowerCase()),
         );
-      return { label: r.replace(/\bany\s+\d*\s*/i, ''), ok: have };
+      return { label: r, ok: have };
     });
   }
 
@@ -205,8 +211,9 @@ export function CombinationCheck({
     ok: r.points > 0,
   }));
 
-  // O/Level ── requirement groups (right): the ACTUAL subjects used to satisfy
-  // each group (greedy, best grade first), never "any".
+  // O/Level ── UNILAG's requirement per group (right). Same idea: show the
+  // requirement, allocate the student's passing subjects (best grade first)
+  // to decide ✓/✗.
   const passing = studentResults.filter((r) => r.points > 0);
   const usedO = new Set<number>();
   const olevelRight: Row[] = prog.requirements.map((g) => {
@@ -217,14 +224,7 @@ export function CombinationCheck({
       .sort((p, q) => q.r.points - p.r.points)
       .slice(0, g.count);
     picked.forEach((p) => usedO.add(p.i));
-    const ok = picked.length >= g.count;
-    const need = g.count - picked.length;
-    const label = ok
-      ? picked.map((p) => p.r.subject).join(' + ')
-      : isAny
-        ? `${need} more subject${need > 1 ? 's' : ''}`
-        : `${g.subjects.join(' / ')}${g.count > 1 ? ` (need ${g.count})` : ''}`;
-    return { label, ok };
+    return { label: requirementLabel(g), ok: picked.length >= g.count };
   });
 
   return (
