@@ -104,6 +104,7 @@ export default function App() {
       {step === 4 &&
         (exploring ? (
           <Alternatives
+            name={name}
             input={input}
             studentResults={studentResults}
             onBack={() => explore(false)}

@@ -8,6 +8,7 @@ import {
   Sparkles,
   Layers,
   GraduationCap,
+  Download,
 } from 'lucide-react';
 import {
   findAlternativeProgrammes,
@@ -27,6 +28,7 @@ import {
 } from '../lib/ui';
 import { Card } from './ui';
 import { CombinationCheck } from './ComboCheck';
+import { generateFacultyPDF } from '../lib/pdf';
 
 // ── Post-UTME headline copy, shared by course card + detail ───────────────
 function postUtme(a: Analysis): { big: string; sub: string } {
@@ -53,10 +55,12 @@ const slide = {
 };
 
 export function Alternatives({
+  name,
   input,
   studentResults,
   onBack,
 }: {
+  name: string;
   input: StudentInput;
   studentResults: OlevelEntry[];
   onBack: () => void;
@@ -67,6 +71,9 @@ export function Alternatives({
   );
   const [faculty, setFaculty] = useState<string | null>(null);
   const [course, setCourse] = useState<Programme | null>(null);
+
+  const downloadFaculty = (fac: string) =>
+    generateFacultyPDF(name, input, studentResults, fac, grouped[fac] ?? []);
 
   const goFaculties = () => {
     setCourse(null);
@@ -143,6 +150,7 @@ export function Alternatives({
               sortedFaculties={sortedFaculties}
               total={total}
               onPick={goCourses}
+              onDownload={downloadFaculty}
             />
           </motion.div>
         )}
@@ -152,6 +160,7 @@ export function Alternatives({
               faculty={faculty}
               items={grouped[faculty] ?? []}
               onPick={goDetail}
+              onDownload={() => downloadFaculty(faculty)}
             />
           </motion.div>
         )}
@@ -176,11 +185,13 @@ function FacultiesView({
   sortedFaculties,
   total,
   onPick,
+  onDownload,
 }: {
   grouped: Record<string, AltItem[]>;
   sortedFaculties: string[];
   total: number;
   onPick: (fac: string) => void;
+  onDownload: (fac: string) => void;
 }) {
   if (total === 0) {
     return (
@@ -216,14 +227,22 @@ function FacultiesView({
           const items = grouped[fac];
           const high = items.filter((it) => it.chance === 'high').length;
           return (
-            <motion.button
+            <motion.div
               key={fac}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05, duration: 0.45 }}
               whileHover={{ scale: 1.02, y: -6 }}
+              role="button"
+              tabIndex={0}
               onClick={() => onPick(fac)}
-              className="group relative flex min-h-[360px] flex-col overflow-hidden rounded-[2rem] border border-slate-100 bg-white text-left shadow-[0_20px_50px_-24px_rgba(15,23,42,0.2)] transition-shadow hover:shadow-[0_34px_80px_-24px_rgba(15,23,42,0.32)]"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onPick(fac);
+                }
+              }}
+              className="group relative flex min-h-[360px] cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-slate-100 bg-white text-left shadow-[0_20px_50px_-24px_rgba(15,23,42,0.2)] transition-shadow hover:shadow-[0_34px_80px_-24px_rgba(15,23,42,0.32)]"
             >
               {/* slim coloured top bar */}
               <div className={`h-2 w-full shrink-0 bg-gradient-to-r ${paint.bar}`} />
@@ -256,15 +275,28 @@ function FacultiesView({
                     <span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
                       {items.length} course{items.length !== 1 ? 's' : ''} available
                     </span>
-                    <span
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${paint.tintBg} ${paint.tintText} transition-transform duration-300 group-hover:translate-x-1`}
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDownload(fac);
+                        }}
+                        title={`Download ${facultyShort(fac)} courses (PDF)`}
+                        className={`inline-flex items-center gap-1.5 rounded-full ${paint.tintBg} ${paint.tintText} px-3 py-2 text-[11px] font-black uppercase tracking-wide transition hover:brightness-95`}
+                      >
+                        <Download className="h-3.5 w-3.5" /> PDF
+                      </button>
+                      <span
+                        className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${paint.tintBg} ${paint.tintText} transition-transform duration-300 group-hover:translate-x-1`}
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </motion.button>
+            </motion.div>
           );
         })}
       </div>
@@ -277,30 +309,41 @@ function CoursesView({
   faculty,
   items,
   onPick,
+  onDownload,
 }: {
   faculty: string;
   items: AltItem[];
   onPick: (prog: Programme) => void;
+  onDownload: () => void;
 }) {
   const meta = facultyMeta(faculty);
   const Icon = meta.icon;
 
   return (
     <div>
-      <div className="mb-5 flex items-center gap-3">
-        <span
-          className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${meta.grad} text-white shadow-lg`}
-        >
-          <Icon className="h-6 w-6" />
-        </span>
-        <div>
-          <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-            {items.length} course{items.length !== 1 ? 's' : ''} you qualify for
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span
+            className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${meta.grad} text-white shadow-lg`}
+          >
+            <Icon className="h-6 w-6" />
+          </span>
+          <div>
+            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+              {items.length} course{items.length !== 1 ? 's' : ''} you qualify for
+            </div>
+            <h2 className="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
+              {facultyShort(faculty)}
+            </h2>
           </div>
-          <h2 className="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
-            {facultyShort(faculty)}
-          </h2>
         </div>
+        <button
+          type="button"
+          onClick={onDownload}
+          className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-black text-white shadow-lg transition hover:bg-slate-800"
+        >
+          <Download className="h-4 w-4" /> Download report
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-7">
