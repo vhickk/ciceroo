@@ -159,28 +159,30 @@ export function CombinationCheck({
         ),
   }));
 
-  // UTME ── UNILAG required groups (right); accurate per-group satisfaction.
-  // Reuse the human-readable prog.utme labels when they line up 1:1 with the
-  // structured groups, otherwise fall back to a label built from the group.
+  // UTME ── requirement groups (right): show the ACTUAL subjects the student
+  // uses to satisfy each group — never a vague "any". When a group isn't met,
+  // show the concrete options / how many more are needed.
   let utmeRight: Row[];
   if (utmeReqs) {
-    const useDisplayLabels = prog.utme.length === utmeReqs.length;
     const usedU = new Set<number>();
-    utmeRight = utmeReqs.map((g, idx) => {
+    utmeRight = utmeReqs.map((g) => {
       const isAny = g.subjects.includes('__ANY__');
-      let filled = 0;
-      for (let i = 0; i < filledUtme.length && filled < g.count; i++) {
+      const picked: string[] = [];
+      for (let i = 0; i < filledUtme.length && picked.length < g.count; i++) {
         if (usedU.has(i)) continue;
         if (isAny || g.subjects.includes(filledUtme[i])) {
           usedU.add(i);
-          filled++;
+          picked.push(filledUtme[i]);
         }
       }
-      const base = useDisplayLabels
-        ? prog.utme[idx]
-        : g.label || (isAny ? 'Any subject' : g.subjects.join(' / '));
-      const label = base + (g.count > 1 && !/\d/.test(base) ? ` ×${g.count}` : '');
-      return { label, ok: filled >= g.count };
+      const ok = picked.length >= g.count;
+      const need = g.count - picked.length;
+      const label = ok
+        ? picked.join(' + ')
+        : isAny
+          ? `${need} more subject${need > 1 ? 's' : ''}`
+          : `${g.subjects.join(' / ')}${g.count > 1 ? ` (need ${g.count})` : ''}`;
+      return { label, ok };
     });
   } else {
     utmeRight = prog.utme.map((r) => {
@@ -192,7 +194,7 @@ export function CombinationCheck({
             s.toLowerCase().includes(r.toLowerCase()) ||
             r.toLowerCase().includes(s.toLowerCase()),
         );
-      return { label: r, ok: have };
+      return { label: r.replace(/\bany\s+\d*\s*/i, ''), ok: have };
     });
   }
 
@@ -203,16 +205,26 @@ export function CombinationCheck({
     ok: r.points > 0,
   }));
 
-  // O/Level ── UNILAG required groups (right); check = enough passing matches
+  // O/Level ── requirement groups (right): the ACTUAL subjects used to satisfy
+  // each group (greedy, best grade first), never "any".
   const passing = studentResults.filter((r) => r.points > 0);
+  const usedO = new Set<number>();
   const olevelRight: Row[] = prog.requirements.map((g) => {
-    const label =
-      (g.label || (g.subjects.includes('__ANY__') ? 'Any subject' : g.subjects.join(' / '))) +
-      (g.count > 1 ? ` ×${g.count}` : '');
-    const matches = g.subjects.includes('__ANY__')
-      ? passing.length
-      : passing.filter((r) => g.subjects.includes(r.subject)).length;
-    return { label, ok: matches >= g.count };
+    const isAny = g.subjects.includes('__ANY__');
+    const picked = passing
+      .map((r, i) => ({ r, i }))
+      .filter((x) => !usedO.has(x.i) && (isAny || g.subjects.includes(x.r.subject)))
+      .sort((p, q) => q.r.points - p.r.points)
+      .slice(0, g.count);
+    picked.forEach((p) => usedO.add(p.i));
+    const ok = picked.length >= g.count;
+    const need = g.count - picked.length;
+    const label = ok
+      ? picked.map((p) => p.r.subject).join(' + ')
+      : isAny
+        ? `${need} more subject${need > 1 ? 's' : ''}`
+        : `${g.subjects.join(' / ')}${g.count > 1 ? ` (need ${g.count})` : ''}`;
+    return { label, ok };
   });
 
   return (
