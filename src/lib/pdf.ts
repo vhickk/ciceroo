@@ -1,7 +1,6 @@
 import { jsPDF } from 'jspdf';
 import {
   analyseProgramme,
-  findBestFive,
   type Analysis,
   type Band,
   type OlevelEntry,
@@ -321,23 +320,11 @@ export function generateFacultyPDF(
   const utme = parseFloat(input.utmeScore) || 0;
   const utmeContrib = Math.min(utme / 8, 50);
   const postUtmeContrib = Math.max(0, Math.min(parseFloat(input.postUtme) || 0, 30));
-  // Requirement-matched best five: the actual subjects that satisfy the
-  // faculty's strongest course (real subject for every slot, incl. "any"
-  // requirements — so the combination shown is what UNILAG actually counts).
-  const repProg = items[0]?.prog;
-  const bestFive = repProg ? findBestFive(studentResults, repProg.requirements) : null;
-  const best5 =
-    bestFive && bestFive.valid && bestFive.selected
-      ? bestFive.selected
-      : [...studentResults]
-          .filter((r) => r.points > 0)
-          .sort((a, b) => b.points - a.points)
-          .slice(0, 5);
-  const olevelPts =
-    bestFive && bestFive.valid && bestFive.totalPoints != null
-      ? bestFive.totalPoints
-      : best5.reduce((s, r) => s + r.points, 0);
-  const aggregate = utmeContrib + olevelPts + postUtmeContrib;
+  // The WAEC results and UTME/Post-UTME scores are the same for every course.
+  // What differs course-to-course is which 5 subjects each one *counts* (its
+  // required combination) — so the O/Level points, and therefore the
+  // aggregate, are shown per course on the cards below, not once here.
+  const waec = studentResults.filter((r) => r.subject && r.grade);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
@@ -357,7 +344,7 @@ export function generateFacultyPDF(
     { align: 'right' },
   );
 
-  // ── WAEC + Aggregate cards (side by side, teal-tipped) ──
+  // ── WAEC results + exam scores cards (side by side, teal-tipped) ──
   const miniCard = (x: number, w: number) => {
     doc.setFillColor(...teal);
     doc.roundedRect(x, 55, w, 34, 2.6, 2.6, 'F');
@@ -369,25 +356,25 @@ export function generateFacultyPDF(
   miniCard(12, 112);
   miniCard(130, 68);
 
-  // WAEC subjects (best 5) — left card
+  // WAEC results (all subjects entered) — left card
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(...teal);
-  doc.text('BEST 5 WAEC SUBJECTS', 18, 64);
-  if (best5.length === 0) {
+  doc.text('YOUR WAEC RESULTS', 18, 64);
+  if (waec.length === 0) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(148, 163, 184);
-    doc.text('No passing O/Level subjects on record.', 18, 72);
+    doc.text('No O/Level subjects on record.', 18, 72);
   }
-  best5.forEach((r, k) => {
-    const col = k % 2;
-    const row = Math.floor(k / 2);
-    const cx = 18 + col * 52;
-    const cyk = 71 + row * 6;
-    const sub = (doc.splitTextToSize(r.subject, 40) as string[])[0];
+  waec.slice(0, 9).forEach((r, k) => {
+    const col = k % 3;
+    const row = Math.floor(k / 3);
+    const cx = 18 + col * 35;
+    const cyk = 70 + row * 6;
+    const sub = (doc.splitTextToSize(r.subject, 26) as string[])[0];
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(7.5);
     doc.setTextColor(51, 65, 85);
     doc.text(sub, cx, cyk);
     const wsub = doc.getTextWidth(sub);
@@ -396,28 +383,26 @@ export function generateFacultyPDF(
     doc.text(` ${r.grade}`, cx + wsub, cyk);
   });
 
-  // Aggregate — right card
+  // Exam scores (fixed across all courses) — right card
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(...teal);
-  doc.text('TOTAL AGGREGATE', 136, 64);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(23);
-  doc.setTextColor(17, 24, 39);
-  const aggStr = aggregate.toFixed(1);
-  doc.text(aggStr, 136, 78);
-  const naw = doc.getTextWidth(aggStr);
-  doc.setFontSize(10);
+  doc.text('YOUR EXAM SCORES', 136, 64);
+  const scoreRow = (label: string, val: string, yy: number) => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(label, 136, yy);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(30, 41, 59);
+    doc.text(val, 192, yy, { align: 'right' });
+  };
+  scoreRow('UTME', `${utmeContrib.toFixed(1)} / 50`, 71);
+  scoreRow('Post-UTME', `${postUtmeContrib.toFixed(1)} / 30`, 77.5);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(6.5);
   doc.setTextColor(148, 163, 184);
-  doc.text('/ 100', 136 + naw + 2, 78);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.setTextColor(120, 130, 145);
-  doc.text(
-    `UTME ${utmeContrib.toFixed(1)} + O'Level ${olevelPts.toFixed(1)} + Post ${postUtmeContrib.toFixed(1)}`,
-    136,
-    85,
-  );
+  doc.text('+ O/Level (best 5) differs by course', 136, 85);
 
   // ── Faculty title ──
   let y = 98;
@@ -478,6 +463,16 @@ export function generateFacultyPDF(
     const nameLines = (doc.splitTextToSize(it.prog.name, cardW - 16) as string[]).slice(0, 2);
     doc.text(nameLines[0], px, cy + 22);
     if (nameLines[1]) doc.text(nameLines[1], px, cy + 27.5);
+
+    // per-course O/Level — makes clear each course counts a different best-5
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `Counts your best 5 for this course: O/Level ${it.olevelPts.toFixed(1)} / 20`,
+      px,
+      cy + 32.5,
+    );
 
     // aggregate headline
     doc.setFont('helvetica', 'bold');
