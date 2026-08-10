@@ -561,7 +561,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Best 2 electives",subjects:["Geography","Chemistry","Technical Drawing","Economics"],count:2},
    ]},
-  {name:"Urban & Regional Planning", faculty:"Faculty of Environmental Sciences", merit:53.5, catchment:{}, utme:["English Language","Mathematics","Geography","any"], utmeReqs:req.utmeEnvPhysics,
+  {name:"Urban & Regional Planning", faculty:"Faculty of Environmental Sciences", merit:53.5, catchment:{}, utme:["English Language","Mathematics","Geography/Economics","+1"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Geography","Economics"],count:1},{subjects:["Chemistry","Physics","Biology","Fine Arts","Technical Drawing"],count:1}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
