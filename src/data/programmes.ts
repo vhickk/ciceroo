@@ -95,6 +95,18 @@ export const FAC_ICONS: Record<string, string> = {
   "Faculty of Education":"graduation-cap",
 };
 
+// ── Subject category pools (for "any N from Arts / Science / Social Sciences") ──
+const uniq = (a: string[]) => Array.from(new Set(a));
+export const ARTS_SUBS = ["Literature-in-English","History","Christian Religious Studies","Islamic Religious Studies","French","Yoruba","Igbo","Hausa","Fine Arts","Visual Arts","Music","Arabic"];
+export const SOCIAL_SUBS = ["Economics","Government","Geography","Commerce","Civic Education","Social Studies","Business Management","History"];
+export const SCIENCE_SUBS = ["Biology","Chemistry","Physics","Further Mathematics","Agricultural Science","Health Science","Health Education","Integrated Science","Computer Studies","Data Processing"];
+export const ARTS_SOCIAL = uniq([...ARTS_SUBS, ...SOCIAL_SUBS]);
+export const SCIENCE_SOCIAL = uniq([...SCIENCE_SUBS, ...SOCIAL_SUBS]);
+export const ARTS_SCIENCE_SOCIAL = uniq([...ARTS_SUBS, ...SCIENCE_SUBS, ...SOCIAL_SUBS]);
+export const NIG_LANG = ["Yoruba","Igbo","Hausa","Arabic"];
+// Law: Arts/Social Sciences, but UNILAG excludes Music/Fine/Visual Arts & Financial Accounting.
+export const LAW_POOL = uniq([...ARTS_SUBS.filter((s) => !["Music","Fine Arts","Visual Arts"].includes(s)), ...SOCIAL_SUBS.filter((s) => s !== "Business Management")]);
+
 export const req: any = {
   engMathBioChem5: [
     {label:"English Language", subjects:["English Language"], count:1},
@@ -124,8 +136,8 @@ req.utmeCSPhysics  = [{subjects:["English Language"],count:1},{subjects:["Mathem
 req.utmeMathSci    = [{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Physics"],count:1},{subjects:["Chemistry","Economics","Biology","Geography"],count:1}];
 req.utmePhysChem   = [{subjects:["English Language"],count:1},{subjects:["Physics"],count:1},{subjects:["Chemistry"],count:1},{subjects:["Biology"],count:1}];
 req.utmeManagement = [{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1}];
-req.utmeLaw        = [{subjects:["English Language"],count:1},{subjects:["Literature-in-English","History","Government","Christian Religious Studies","Islamic Religious Studies","French","Yoruba","Igbo","Hausa","Economics","Geography","Sociology"],count:3}];
-req.utmeArts       = [{subjects:["English Language"],count:1},{subjects:["Literature-in-English","History","Government","Christian Religious Studies","Islamic Religious Studies","French","Yoruba","Igbo","Hausa","Economics","Geography","Fine Arts","Visual Arts","Music","Sociology","Arabic"],count:3}];
+req.utmeLaw        = [{subjects:["English Language"],count:1},{subjects:LAW_POOL,count:3,label:"Arts / Social Sciences"}];
+req.utmeArts       = [{subjects:["English Language"],count:1},{subjects:ARTS_SOCIAL,count:3,label:"Arts / Social Sciences"}];
 req.utmeSocial     = [{subjects:["English Language"],count:1},{subjects:["__ANY__"],count:3}];
 req.utmeEnvPhysics = [{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Physics"],count:1},{subjects:["__ANY__"],count:1}];
 req.utmeEnvEcon    = [{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics","Geography","Physics"],count:1},{subjects:["__ANY__"],count:1}];
@@ -341,7 +353,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Literature-in-English",subjects:["Literature-in-English"],count:1},
-    {label:"Best 2 Arts/Social Sciences",subjects:["Government","History","Economics","Geography","Christian Religious Studies","Islamic Religious Studies","Yoruba","Igbo","Hausa","French","Sociology"],count:2},
+    {label:"2 Arts/Social Sciences",subjects:LAW_POOL,count:2},
    ]},
 
   // ARTS
