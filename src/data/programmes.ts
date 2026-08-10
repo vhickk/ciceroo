@@ -273,7 +273,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
   {name:"Business Administration", faculty:"Faculty of Management Sciences", merit:69.3, catchment:{Ekiti:52.725,Lagos:60.2,Ogun:68.15,Ondo:66.075,Osun:64.05,Oyo:67.025},
    utme:["English Language","Mathematics","Economics","+1 subject"],
-   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1}],
+   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -282,7 +282,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
   {name:"Banking & Finance", faculty:"Faculty of Management Sciences", merit:70.35, catchment:{Ekiti:59.225,Lagos:64,Ogun:67.625,Ondo:61.725,Osun:55.875,Oyo:57.375},
    utme:["English Language","Mathematics","Economics","+1 subject"],
-   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1}],
+   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -319,7 +319,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
   {name:"Employment Relations & HRM", faculty:"Faculty of Management Sciences", merit:60.775, catchment:{Ekiti:55.65,Lagos:59.6,Ogun:54.5,Ondo:60.025,Osun:58.15,Oyo:53.925},
    utme:["English Language","Mathematics","Economics","+1 subject"],
-   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1}],
+   utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
