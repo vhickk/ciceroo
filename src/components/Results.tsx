@@ -13,16 +13,20 @@ import {
   Download,
   Layers,
   ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from 'lucide-react';
 import { PROGRAMMES } from '../data/programmes';
 import {
   analyseProgramme,
   findAlternativeProgrammes,
+  type Analysis,
   type OlevelEntry,
   type StudentInput,
 } from '../lib/scoring';
 import { generatePDF } from '../lib/pdf';
-import { facultyMeta, facultyShort, BAND_STYLE } from '../lib/ui';
+import { facultyMeta, facultyShort, BAND_STYLE, SAFETY_STYLE } from '../lib/ui';
 import { Card, StatTile, SectionLabel, PrimaryButton, GhostButton } from './ui';
 import { CombinationCheck } from './ComboCheck';
 
@@ -178,6 +182,11 @@ export function Results({
         </Card>
       )}
 
+      {/* ── 2-YEAR TREND + SAFETY PREDICTION ── */}
+      {a.meritPrev !== null && a.safety !== 'unknown' && eligible && (
+        <TrendPanel a={a} />
+      )}
+
       {/* ── STAT TILES ── */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatTile
@@ -298,5 +307,67 @@ function Legend({ color, label }: { color: string; label: string }) {
     <span className="inline-flex items-center gap-1.5">
       <span className={`h-3 w-3 rounded ${color}`} /> {label}
     </span>
+  );
+}
+
+// ── 2-year cut-off trend + safety prediction ──────────────────────────────
+function TrendPanel({ a }: { a: Analysis }) {
+  const s = SAFETY_STYLE[a.safety as keyof typeof SAFETY_STYLE];
+  const delta = a.trendDelta ?? 0;
+  const rising = delta > 1;
+  const falling = delta < -1;
+  const TrendIcon = rising ? TrendingUp : falling ? TrendingDown : Minus;
+  const trendWord = rising ? 'rose' : falling ? 'fell' : 'held steady';
+  const trendColor = rising ? 'text-rose-500' : falling ? 'text-emerald-600' : 'text-slate-400';
+
+  return (
+    <Card className="overflow-hidden p-6 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <SectionLabel icon={TrendingUp}>2-year cut-off trend & prediction</SectionLabel>
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-wide ring-1 ${s.chip}`}
+        >
+          <span className={`h-2 w-2 rounded-full ${s.dot}`} /> {s.label}
+        </span>
+      </div>
+
+      <div className="mt-5 grid items-center gap-5 md:grid-cols-[auto_1fr]">
+        {/* two-year cut-off track */}
+        <div className="flex items-center gap-3">
+          <YearPill year="2024/25" value={a.meritPrev!} muted />
+          <TrendIcon className={`h-6 w-6 shrink-0 ${trendColor}`} strokeWidth={2.5} />
+          <YearPill year="2025/26" value={a.merit} />
+        </div>
+        <p className="text-sm font-medium leading-relaxed text-slate-600">
+          The merit cut-off {' '}
+          <span className={`font-black ${trendColor}`}>
+            {trendWord}
+            {delta !== 0 && ` ${delta > 0 ? '+' : ''}${delta.toFixed(1)}`}
+          </span>{' '}
+          over the last two years. Your aggregate of{' '}
+          <span className="font-black text-slate-900">{a.aggregate.toFixed(1)}</span>{' '}
+          <span className={`bg-gradient-to-r ${s.grad} bg-clip-text font-black text-transparent`}>
+            {s.blurb}
+          </span>
+          {' '}— so for the next cycle you're a{' '}
+          <span className="font-black text-slate-900">{s.label.toLowerCase()}</span>.
+        </p>
+      </div>
+    </Card>
+  );
+}
+
+function YearPill({ year, value, muted }: { year: string; value: number; muted?: boolean }) {
+  return (
+    <div
+      className={`rounded-2xl border px-4 py-2.5 text-center ${
+        muted ? 'border-slate-100 bg-slate-50/60' : 'border-teal-100 bg-teal-50/60'
+      }`}
+    >
+      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-slate-400">{year}</div>
+      <div className={`text-lg font-black tabular-nums ${muted ? 'text-slate-500' : 'text-teal-700'}`}>
+        {value.toFixed(1)}
+      </div>
+    </div>
   );
 }

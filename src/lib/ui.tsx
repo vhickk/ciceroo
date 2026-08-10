@@ -12,7 +12,42 @@ import {
   BookOpen,
   type LucideIcon,
 } from 'lucide-react';
-import type { Band, Chance } from './scoring';
+import type { Band, Chance, Safety } from './scoring';
+
+// ── Safety rating styling (2-year cut-off prediction) ─────────────────────
+export const SAFETY_STYLE: Record<
+  Exclude<Safety, 'unknown'>,
+  { label: string; grad: string; chip: string; dot: string; blurb: string }
+> = {
+  safe: {
+    label: 'Safe bet',
+    grad: 'from-emerald-500 to-teal-500',
+    chip: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
+    dot: 'bg-emerald-500',
+    blurb: 'clears both of the last two years comfortably',
+  },
+  likely: {
+    label: 'Likely in',
+    grad: 'from-teal-500 to-cyan-500',
+    chip: 'bg-teal-50 text-teal-700 ring-teal-100',
+    dot: 'bg-teal-500',
+    blurb: 'sits above both of the last two years’ cut-offs',
+  },
+  borderline: {
+    label: 'Borderline',
+    grad: 'from-amber-500 to-orange-500',
+    chip: 'bg-amber-50 text-amber-700 ring-amber-100',
+    dot: 'bg-amber-500',
+    blurb: 'sits between the last two years — it could go either way',
+  },
+  risky: {
+    label: 'Risky',
+    grad: 'from-rose-500 to-red-500',
+    chip: 'bg-rose-50 text-rose-700 ring-rose-100',
+    dot: 'bg-rose-500',
+    blurb: 'falls below both of the last two years’ cut-offs',
+  },
+};
 
 export const FACULTY_META: Record<
   string,

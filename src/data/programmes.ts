@@ -5,6 +5,7 @@
 export interface ReqGroup { label?: string; subjects: string[]; count: number; }
 export interface Programme {
   name: string; faculty: string; merit: number;
+  meritPrev?: number; // prior-year (2024/25) merit cut-off, for trend/safety prediction
   catchment: Record<string, number>;
   utme: string[]; requirements: ReqGroup[]; utmeReqs: ReqGroup[];
 }
@@ -155,15 +156,15 @@ req.utmeEconEd     = [{subjects:["English Language"],count:1},{subjects:["Mathem
 
 export const PROGRAMMES: Programme[] = [
   // COLLEGE OF MEDICINE
-  {name:"Medicine & Surgery", faculty:"College of Medicine", merit:85.025, catchment:{Ekiti:79.975,Lagos:79.75,Ogun:83.8,Ondo:81.325,Osun:81.775,Oyo:81.575}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Nursing", faculty:"College of Medicine", merit:79.8, catchment:{Ekiti:73.2,Lagos:73.7,Ogun:77.5,Ondo:77.1,Osun:77.85,Oyo:77.65}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Physiotherapy", faculty:"College of Medicine", merit:74.725, catchment:{Ekiti:66.25,Lagos:72.975,Ogun:74.2,Ondo:73.6,Osun:72.25,Oyo:73.175}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Radiography", faculty:"College of Medicine", merit:77.375, catchment:{Ekiti:74.9,Lagos:73.975,Ogun:76.9,Ondo:70.35,Osun:75.625,Oyo:76.7}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Anatomy", faculty:"College of Medicine", merit:72.4, catchment:{Ekiti:71.5,Lagos:70.35,Ogun:70.125,Ondo:71.65,Osun:66.475,Oyo:64.75}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Pharmacology", faculty:"College of Medicine", merit:73.125, catchment:{Ekiti:69.025,Lagos:69.65,Ogun:71.925,Ondo:67.075,Osun:66.3,Oyo:71.6}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Physiology", faculty:"College of Medicine", merit:72.875, catchment:{Ekiti:66.45,Lagos:63.8,Ogun:70.225,Ondo:57.3,Osun:70.925,Oyo:67.95}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Medical Laboratory Science", faculty:"College of Medicine", merit:74.375, catchment:{Ekiti:70.925,Lagos:72,Ogun:73,Ondo:70.6,Osun:72.7,Oyo:72.825}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Dentistry", faculty:"College of Medicine", merit:76.65, catchment:{Ekiti:70.875,Lagos:65.825,Ogun:75.325,Ondo:72.775,Osun:69.175,Oyo:64.975}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Medicine & Surgery", faculty:"College of Medicine", merit:85.025, meritPrev:82.125, catchment:{Ekiti:79.975,Lagos:79.75,Ogun:83.8,Ondo:81.325,Osun:81.775,Oyo:81.575}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Nursing", faculty:"College of Medicine", merit:79.8, meritPrev:78.575, catchment:{Ekiti:73.2,Lagos:73.7,Ogun:77.5,Ondo:77.1,Osun:77.85,Oyo:77.65}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Physiotherapy", faculty:"College of Medicine", merit:74.725, meritPrev:74.475, catchment:{Ekiti:66.25,Lagos:72.975,Ogun:74.2,Ondo:73.6,Osun:72.25,Oyo:73.175}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Radiography", faculty:"College of Medicine", merit:77.375, meritPrev:75.175, catchment:{Ekiti:74.9,Lagos:73.975,Ogun:76.9,Ondo:70.35,Osun:75.625,Oyo:76.7}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Anatomy", faculty:"College of Medicine", merit:72.4, meritPrev:73.3, catchment:{Ekiti:71.5,Lagos:70.35,Ogun:70.125,Ondo:71.65,Osun:66.475,Oyo:64.75}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Pharmacology", faculty:"College of Medicine", merit:73.125, meritPrev:74.5, catchment:{Ekiti:69.025,Lagos:69.65,Ogun:71.925,Ondo:67.075,Osun:66.3,Oyo:71.6}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Physiology", faculty:"College of Medicine", merit:72.875, meritPrev:71.9, catchment:{Ekiti:66.45,Lagos:63.8,Ogun:70.225,Ondo:57.3,Osun:70.925,Oyo:67.95}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Medical Laboratory Science", faculty:"College of Medicine", merit:74.375, meritPrev:74.675, catchment:{Ekiti:70.925,Lagos:72,Ogun:73,Ondo:70.6,Osun:72.7,Oyo:72.825}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Dentistry", faculty:"College of Medicine", merit:76.65, meritPrev:77.4, catchment:{Ekiti:70.875,Lagos:65.825,Ogun:75.325,Ondo:72.775,Osun:69.175,Oyo:64.975}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
 
   // PHARMACY
   {name:"Pharmacy", faculty:"Faculty of Pharmacy", merit:76.4, catchment:{Ekiti:69.175,Lagos:69.5,Ogun:73.3,Ondo:69.55,Osun:73.725,Oyo:71.275}, utme:["English Language","Physics","Chemistry","Biology"], utmeReqs:req.utmePhysChem,
@@ -176,13 +177,13 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // ENGINEERING
-  {name:"Computer Engineering", faculty:"Faculty of Engineering", merit:82.875, catchment:{Ekiti:71.8,Lagos:78.3,Ogun:80.75,Ondo:77,Osun:81.475,Oyo:79}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Electrical/Electronics Engineering", faculty:"Faculty of Engineering", merit:79.5, catchment:{Ekiti:63.35,Lagos:69.775,Ogun:77.1,Ondo:68.525,Osun:72.1,Oyo:72.125}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Mechanical Engineering", faculty:"Faculty of Engineering", merit:78.525, catchment:{Ekiti:71.6,Lagos:73.825,Ogun:75.85,Ondo:66.3,Osun:72.5,Oyo:72.575}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Systems Engineering", faculty:"Faculty of Engineering", merit:78.225, catchment:{Ekiti:65.475,Lagos:73.475,Ogun:75.875,Ondo:58.35,Osun:70.6,Oyo:73.95}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Civil Engineering", faculty:"Faculty of Engineering", merit:75.625, catchment:{Ekiti:65.525,Lagos:74.5,Ogun:72.075,Ondo:65.575,Osun:72.375,Oyo:71.05}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Chemical Engineering", faculty:"Faculty of Engineering", merit:72.8, catchment:{Ekiti:68.25,Lagos:62.35,Ogun:64.9,Osun:57.65,Oyo:59.325}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
-  {name:"Biomedical Engineering", faculty:"Faculty of Engineering", merit:73.3, catchment:{Lagos:66.125,Ogun:68.45,Ondo:69.55,Oyo:68.275}, utme:["English Language","Chemistry","Mathematics","Physics"], utmeReqs:req.utmeEngineering,
+  {name:"Computer Engineering", faculty:"Faculty of Engineering", merit:82.875, meritPrev:81.3, catchment:{Ekiti:71.8,Lagos:78.3,Ogun:80.75,Ondo:77,Osun:81.475,Oyo:79}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Electrical/Electronics Engineering", faculty:"Faculty of Engineering", merit:79.5, meritPrev:74.925, catchment:{Ekiti:63.35,Lagos:69.775,Ogun:77.1,Ondo:68.525,Osun:72.1,Oyo:72.125}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Mechanical Engineering", faculty:"Faculty of Engineering", merit:78.525, meritPrev:75.05, catchment:{Ekiti:71.6,Lagos:73.825,Ogun:75.85,Ondo:66.3,Osun:72.5,Oyo:72.575}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Systems Engineering", faculty:"Faculty of Engineering", merit:78.225, meritPrev:72.1, catchment:{Ekiti:65.475,Lagos:73.475,Ogun:75.875,Ondo:58.35,Osun:70.6,Oyo:73.95}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Civil Engineering", faculty:"Faculty of Engineering", merit:75.625, meritPrev:72.7, catchment:{Ekiti:65.525,Lagos:74.5,Ogun:72.075,Ondo:65.575,Osun:72.375,Oyo:71.05}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Chemical Engineering", faculty:"Faculty of Engineering", merit:72.8, meritPrev:69.05, catchment:{Ekiti:68.25,Lagos:62.35,Ogun:64.9,Osun:57.65,Oyo:59.325}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
+  {name:"Biomedical Engineering", faculty:"Faculty of Engineering", merit:73.3, meritPrev:72.8, catchment:{Lagos:66.125,Ogun:68.45,Ondo:69.55,Oyo:68.275}, utme:["English Language","Chemistry","Mathematics","Physics"], utmeReqs:req.utmeEngineering,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -195,7 +196,7 @@ export const PROGRAMMES: Programme[] = [
   {name:"Surveying & Geoinformatics Engineering", faculty:"Faculty of Engineering", merit:58.125, catchment:{}, utme:["English Language","Chemistry","Mathematics","Physics"], requirements:req.engineering, utmeReqs:req.utmeEngineering},
 
   // SCIENCE
-  {name:"Computer Science", faculty:"Faculty of Science", merit:83.425, catchment:{Ekiti:80.125,Lagos:79.6,Ogun:82.025,Ondo:77.5,Osun:79.2,Oyo:78.1}, utme:["English Language","Mathematics","Physics","Chemistry or Biology"], utmeReqs:req.utmeCSPhysics,
+  {name:"Computer Science", faculty:"Faculty of Science", merit:83.425, meritPrev:79.775, catchment:{Ekiti:80.125,Lagos:79.6,Ogun:82.025,Ondo:77.5,Osun:79.2,Oyo:78.1}, utme:["English Language","Mathematics","Physics","Chemistry or Biology"], utmeReqs:req.utmeCSPhysics,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -203,7 +204,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Chemistry or Biology",subjects:["Chemistry","Biology"],count:1},
    ]},
-  {name:"Data Science", faculty:"Faculty of Science", merit:76.925, catchment:{Ekiti:72.65,Lagos:74.025,Ogun:75.775,Ondo:73.9,Osun:74.3,Oyo:72.675}, utme:["English Language","Mathematics","Physics","one of Chemistry/Biology/Economics/Geography"], utmeReqs:req.utmeCSPhysics,
+  {name:"Data Science", faculty:"Faculty of Science", merit:76.925, meritPrev:74, catchment:{Ekiti:72.65,Lagos:74.025,Ogun:75.775,Ondo:73.9,Osun:74.3,Oyo:72.675}, utme:["English Language","Mathematics","Physics","one of Chemistry/Biology/Economics/Geography"], utmeReqs:req.utmeCSPhysics,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -211,9 +212,9 @@ export const PROGRAMMES: Programme[] = [
     {label:"Science/Social electives (best 2)",subjects:["Further Mathematics","Chemistry","Biology","Economics","Geography"],count:2},
    ]},
   {name:"Biochemistry", faculty:"Faculty of Science", merit:69.4, catchment:{Ekiti:64.775,Lagos:66.275,Ogun:66.275,Ondo:65,Osun:64.375,Oyo:67.15}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Cell Biology & Genetics", faculty:"Faculty of Science", merit:68.975, catchment:{Ekiti:63.325,Lagos:63.85,Ogun:66.55,Ondo:65.75,Osun:56.125,Oyo:64.225}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Microbiology", faculty:"Faculty of Science", merit:68.075, catchment:{Ekiti:61.2,Lagos:65.95,Ogun:64.9,Ondo:62,Osun:57.175,Oyo:54.95}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Mathematics", faculty:"Faculty of Science", merit:63.675, catchment:{Lagos:58.625,Ogun:52.5,Ondo:60.9,Osun:61.825}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
+  {name:"Cell Biology & Genetics", faculty:"Faculty of Science", merit:68.975, meritPrev:68.95, catchment:{Ekiti:63.325,Lagos:63.85,Ogun:66.55,Ondo:65.75,Osun:56.125,Oyo:64.225}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Microbiology", faculty:"Faculty of Science", merit:68.075, meritPrev:69.175, catchment:{Ekiti:61.2,Lagos:65.95,Ogun:64.9,Ondo:62,Osun:57.175,Oyo:54.95}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Mathematics", faculty:"Faculty of Science", merit:63.675, meritPrev:65.025, catchment:{Lagos:58.625,Ogun:52.5,Ondo:60.9,Osun:61.825}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -221,7 +222,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Science/Social elective",subjects:["Chemistry","Economics","Biology","Geography"],count:1},
    ]},
-  {name:"Statistics", faculty:"Faculty of Science", merit:65.925, catchment:{Lagos:64.1,Ogun:60.9,Ondo:63.775,Oyo:60.925}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
+  {name:"Statistics", faculty:"Faculty of Science", merit:65.925, meritPrev:69.9, catchment:{Lagos:64.1,Ogun:60.9,Ondo:63.775,Oyo:60.925}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -229,7 +230,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Science/Social elective",subjects:["Chemistry","Economics","Biology","Geography"],count:1},
    ]},
-  {name:"Industrial Mathematics", faculty:"Faculty of Science", merit:67.875, catchment:{Ekiti:61.8,Lagos:52.5,Ogun:62.425,Ondo:64.125}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
+  {name:"Industrial Mathematics", faculty:"Faculty of Science", merit:67.875, meritPrev:65.55, catchment:{Ekiti:61.8,Lagos:52.5,Ogun:62.425,Ondo:64.125}, utme:["English Language","Mathematics","Physics","one of Chemistry/Economics/Biology/Geography"], utmeReqs:req.utmeMathSci,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -237,7 +238,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Science/Social elective",subjects:["Chemistry","Economics","Biology","Geography"],count:1},
    ]},
-  {name:"Physics", faculty:"Faculty of Science", merit:60.25, catchment:{Ekiti:52.225,Lagos:54.925,Ogun:55.125,Ondo:55.35}, utme:["English Language","Mathematics","Physics","Chemistry"], utmeReqs:req.utmeEngineering,
+  {name:"Physics", faculty:"Faculty of Science", merit:60.25, meritPrev:54.225, catchment:{Ekiti:52.225,Lagos:54.925,Ogun:55.125,Ondo:55.35}, utme:["English Language","Mathematics","Physics","Chemistry"], utmeReqs:req.utmeEngineering,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -246,7 +247,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Further Mathematics",subjects:["Further Mathematics"],count:1},
    ]},
   {name:"Chemistry", faculty:"Faculty of Science", merit:59.5, catchment:{Lagos:59.3,Ogun:54.325,Osun:54.15}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Geology", faculty:"Faculty of Science", merit:63.55, catchment:{Ekiti:60.125,Lagos:58.375,Ogun:58.45,Ondo:54.575,Osun:61.375,Oyo:60.825}, utme:["English Language","Physics","Chemistry","Biology"], utmeReqs:req.utmePhysChem,
+  {name:"Geology", faculty:"Faculty of Science", merit:63.55, meritPrev:66.4, catchment:{Ekiti:60.125,Lagos:58.375,Ogun:58.45,Ondo:54.575,Osun:61.375,Oyo:60.825}, utme:["English Language","Physics","Chemistry","Biology"], utmeReqs:req.utmePhysChem,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -254,7 +255,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Chemistry",subjects:["Chemistry"],count:1},
     {label:"Biology",subjects:["Biology"],count:1},
    ]},
-  {name:"Geophysics", faculty:"Faculty of Science", merit:65.225, catchment:{Ekiti:55.7,Lagos:57.925,Ogun:53.675,Ondo:54.75,Osun:52.675,Oyo:60.55}, utme:["English Language","Physics","Chemistry","Biology"], utmeReqs:req.utmePhysChem,
+  {name:"Geophysics", faculty:"Faculty of Science", merit:65.225, meritPrev:68, catchment:{Ekiti:55.7,Lagos:57.925,Ogun:53.675,Ondo:54.75,Osun:52.675,Oyo:60.55}, utme:["English Language","Physics","Chemistry","Biology"], utmeReqs:req.utmePhysChem,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -262,10 +263,10 @@ export const PROGRAMMES: Programme[] = [
     {label:"Chemistry",subjects:["Chemistry"],count:1},
     {label:"Biology",subjects:["Biology"],count:1},
    ]},
-  {name:"Botany", faculty:"Faculty of Science", merit:51.45, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Zoology", faculty:"Faculty of Science", merit:57.25, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Botany", faculty:"Faculty of Science", merit:51.45, meritPrev:50.525, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Zoology", faculty:"Faculty of Science", merit:57.25, meritPrev:53.6, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
   {name:"Marine Biology", faculty:"Faculty of Science", merit:55.45, catchment:{Osun:54.725}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
-  {name:"Fisheries & Aquaculture", faculty:"Faculty of Science", merit:52.475, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
+  {name:"Fisheries & Aquaculture", faculty:"Faculty of Science", merit:52.475, meritPrev:51.6, catchment:{}, utme:["English Language","Biology","Chemistry","Physics"], requirements:req.engMathBioChemPhy, utmeReqs:req.utmeMedical},
   {name:"Biostatistics", faculty:"Faculty of Science", merit:52.125, catchment:{}, utme:["English Language","Mathematics","Physics","one of Chemistry/Biology/Economics/Geography"], utmeReqs:req.utmeMathSci,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
@@ -274,7 +275,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Science/Social elective",subjects:["Chemistry","Biology","Economics","Geography"],count:1},
    ]},
-  {name:"Environmental Standards", faculty:"Faculty of Science", merit:65.775, catchment:{Lagos:63.575,Oyo:62.625}, utme:["English Language","any 3 subjects"], utmeReqs:req.utmeOpen,
+  {name:"Environmental Standards", faculty:"Faculty of Science", merit:65.775, meritPrev:60.5, catchment:{Lagos:63.575,Oyo:62.625}, utme:["English Language","any 3 subjects"], utmeReqs:req.utmeOpen,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -282,7 +283,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // MANAGEMENT SCIENCES — O/Level + UTME from official 2025/2026 requirements
-  {name:"Accounting", faculty:"Faculty of Management Sciences", merit:75.7, catchment:{Ekiti:69.475,Lagos:71.4,Ogun:73.825,Ondo:68.8,Osun:72.325,Oyo:71},
+  {name:"Accounting", faculty:"Faculty of Management Sciences", merit:75.7, meritPrev:74.4, catchment:{Ekiti:69.475,Lagos:71.4,Ogun:73.825,Ondo:68.8,Osun:72.325,Oyo:71},
    utme:["English Language","Mathematics","Economics","+1 elective"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["Financial Accounting","Further Mathematics","Geography","Government","Literature-in-English","Biology"],count:1}],
    requirements:[
@@ -291,7 +292,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 electives",subjects:["Financial Accounting","Further Mathematics","Geography","Government","Biology","Business Management","Data Processing","Computer Studies","Literature-in-English"],count:2},
    ]},
-  {name:"Business Administration", faculty:"Faculty of Management Sciences", merit:69.3, catchment:{Ekiti:52.725,Lagos:60.2,Ogun:68.15,Ondo:66.075,Osun:64.05,Oyo:67.025},
+  {name:"Business Administration", faculty:"Faculty of Management Sciences", merit:69.3, meritPrev:68.675, catchment:{Ekiti:52.725,Lagos:60.2,Ogun:68.15,Ondo:66.075,Osun:64.05,Oyo:67.025},
    utme:["English Language","Mathematics","Economics","+1 subject"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
@@ -300,7 +301,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 electives",subjects:["Financial Accounting","Government","Geography","Christian Religious Studies","Islamic Religious Studies","Business Management"],count:2},
    ]},
-  {name:"Banking & Finance", faculty:"Faculty of Management Sciences", merit:70.35, catchment:{Ekiti:59.225,Lagos:64,Ogun:67.625,Ondo:61.725,Osun:55.875,Oyo:57.375},
+  {name:"Banking & Finance", faculty:"Faculty of Management Sciences", merit:70.35, meritPrev:69.35, catchment:{Ekiti:59.225,Lagos:64,Ogun:67.625,Ondo:61.725,Osun:55.875,Oyo:57.375},
    utme:["English Language","Mathematics","Economics","+1 subject"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
@@ -309,7 +310,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 electives",subjects:["Government","Geography","Commerce","Financial Accounting","Physics","Chemistry","Biology","Business Management","Book Keeping"],count:2},
    ]},
-  {name:"Actuarial Science", faculty:"Faculty of Management Sciences", merit:64.925, catchment:{Ekiti:59.725,Ogun:63.15,Ondo:64.05,Osun:60.375,Oyo:59},
+  {name:"Actuarial Science", faculty:"Faculty of Management Sciences", merit:64.925, meritPrev:67.275, catchment:{Ekiti:59.725,Ogun:63.15,Ondo:64.05,Osun:60.375,Oyo:59},
    utme:["English Language","Mathematics","Economics","+1 elective"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["Geography","Government","Biology","Chemistry","Physics","Commerce"],count:1}],
    requirements:[
@@ -318,7 +319,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 electives",subjects:["Financial Accounting","Data Processing","Christian Religious Studies","Islamic Religious Studies","Further Mathematics","Geography","Government","Biology","Chemistry","Physics","Commerce","Civic Education","Insurance"],count:2},
    ]},
-  {name:"Insurance", faculty:"Faculty of Management Sciences", merit:65.85, catchment:{Lagos:57.75,Ogun:64.375,Ondo:53.05,Osun:53.05,Oyo:55.1},
+  {name:"Insurance", faculty:"Faculty of Management Sciences", merit:65.85, meritPrev:64.975, catchment:{Lagos:57.75,Ogun:64.375,Ondo:53.05,Osun:53.05,Oyo:55.1},
    utme:["English Language","Mathematics","Economics","+1 elective"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["Financial Accounting","Geography","Government","Biology","Chemistry","Physics","Commerce"],count:1}],
    requirements:[
@@ -327,7 +328,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 electives",subjects:["Financial Accounting","Data Processing","Christian Religious Studies","Islamic Religious Studies","Further Mathematics","Geography","Government","Biology","Chemistry","Physics","Commerce","Civic Education","Insurance"],count:2},
    ]},
-  {name:"Taxation", faculty:"Faculty of Management Sciences", merit:66.4, catchment:{Ekiti:57.025,Lagos:62.65,Ogun:63.725,Ondo:61.45,Osun:62.25,Oyo:59.025},
+  {name:"Taxation", faculty:"Faculty of Management Sciences", merit:66.4, meritPrev:59.35, catchment:{Ekiti:57.025,Lagos:62.65,Ogun:63.725,Ondo:61.45,Osun:62.25,Oyo:59.025},
    utme:["English Language","Mathematics","Economics","+1 elective"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["Commerce","Government","Business Management","Geography","Literature-in-English","Civic Education"],count:1}],
    requirements:[
@@ -337,7 +338,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Financial Accounting",subjects:["Financial Accounting"],count:1},
     {label:"1 elective",subjects:["Commerce","Government","Business Management","Geography","Literature-in-English","Civic Education"],count:1},
    ]},
-  {name:"Employment Relations & HRM", faculty:"Faculty of Management Sciences", merit:60.775, catchment:{Ekiti:55.65,Lagos:59.6,Ogun:54.5,Ondo:60.025,Osun:58.15,Oyo:53.925},
+  {name:"Employment Relations & HRM", faculty:"Faculty of Management Sciences", merit:60.775, meritPrev:68.15, catchment:{Ekiti:55.65,Lagos:59.6,Ogun:54.5,Ondo:60.025,Osun:58.15,Oyo:53.925},
    utme:["English Language","Mathematics","Economics","+1 subject"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1,label:"Science / Social Science / Arts"}],
    requirements:[
@@ -356,7 +357,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // LAW
-  {name:"Law", faculty:"Faculty of Law", merit:78.225, catchment:{Ekiti:73.625,Lagos:75.9,Ogun:76.55,Ondo:75.75,Osun:76.35,Oyo:74.525}, utme:["English Language","any 3 Arts/Social Sciences"], utmeReqs:req.utmeLaw,
+  {name:"Law", faculty:"Faculty of Law", merit:78.225, meritPrev:72, catchment:{Ekiti:73.625,Lagos:75.9,Ogun:76.55,Ondo:75.75,Osun:76.35,Oyo:74.525}, utme:["English Language","any 3 Arts/Social Sciences"], utmeReqs:req.utmeLaw,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -365,7 +366,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // ARTS — O/Level + UTME from official 2025/2026 requirements
-  {name:"English Language", faculty:"Faculty of Arts", merit:68.175, catchment:{Ekiti:57.475,Lagos:59.2,Ogun:65.05,Ondo:62.025,Osun:55.675,Oyo:63.3},
+  {name:"English Language", faculty:"Faculty of Arts", merit:68.175, meritPrev:66.8, catchment:{Ekiti:57.475,Lagos:59.2,Ogun:65.05,Ondo:62.025,Osun:55.675,Oyo:63.3},
    utme:["English Language","Literature-in-English","+2 Arts"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Literature-in-English"],count:1},{subjects:["Christian Religious Studies","Islamic Religious Studies","French","History","Government","Yoruba","Igbo","Hausa","Arabic"],count:2}],
    requirements:[
@@ -374,7 +375,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Literature-in-English",subjects:["Literature-in-English"],count:1},
     {label:"2 of French / History / Government / CRS / IRS / Nigerian Language",subjects:["French","History","Government","Christian Religious Studies","Islamic Religious Studies","Yoruba","Igbo","Hausa","Arabic"],count:2},
    ]},
-  {name:"History & Strategic Studies", faculty:"Faculty of Arts", merit:70.725, catchment:{Ekiti:58.75,Lagos:60.175,Ogun:67.675,Ondo:65.725,Osun:61.625,Oyo:65.1},
+  {name:"History & Strategic Studies", faculty:"Faculty of Arts", merit:70.725, meritPrev:69.65, catchment:{Ekiti:58.75,Lagos:60.175,Ogun:67.675,Ondo:65.725,Osun:61.625,Oyo:65.1},
    utme:["English Language","History/Government","+2 Arts/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["History","Government"],count:1},{subjects:ARTS_SOCIAL,count:2,label:"Arts / Social Sciences"}],
    requirements:[
@@ -383,7 +384,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"History or Government",subjects:["History","Government"],count:1},
     {label:"2 of Literature / CRS / IRS / Civic / Nigerian Language",subjects:["Literature-in-English","Christian Religious Studies","Islamic Religious Studies","Civic Education","Yoruba","Igbo","Hausa","Arabic"],count:2},
    ]},
-  {name:"Creative Arts", faculty:"Faculty of Arts", merit:69.5, catchment:{Ekiti:59.375,Lagos:61.675,Ogun:66.225,Ondo:57.725,Osun:65.175,Oyo:65.75},
+  {name:"Creative Arts", faculty:"Faculty of Arts", merit:69.5, meritPrev:68.825, catchment:{Ekiti:59.375,Lagos:61.675,Ogun:66.225,Ondo:57.725,Osun:65.175,Oyo:65.75},
    utme:["English Language","Fine Arts/Literature/Music","+2 subjects"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Fine Arts","Visual Arts","Literature-in-English","Music"],count:1},{subjects:ARTS_SCIENCE_SOCIAL,count:2,label:"one Arts + any Science/Social"}],
    requirements:[
@@ -393,7 +394,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"1 Arts subject",subjects:["Fine Arts","Visual Arts","Music","Christian Religious Studies","Islamic Religious Studies","Government","History","French","Yoruba","Igbo"],count:1},
     {label:"1 more subject",subjects:["__ANY__"],count:1},
    ]},
-  {name:"Philosophy", faculty:"Faculty of Arts", merit:66.075, catchment:{Ekiti:58.225,Lagos:54.6,Ogun:60.6,Ondo:57.3,Osun:57.725,Oyo:55.5},
+  {name:"Philosophy", faculty:"Faculty of Arts", merit:66.075, meritPrev:65.425, catchment:{Ekiti:58.225,Lagos:54.6,Ogun:60.6,Ondo:57.3,Osun:57.725,Oyo:55.5},
    utme:["English Language","+3 Arts/Science/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:ARTS_SCIENCE_SOCIAL,count:3,label:"Arts / Science / Social Sciences"}],
    requirements:[
@@ -401,7 +402,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 of Arts/Science/Social Sciences",subjects:ARTS_SCIENCE_SOCIAL,count:3},
    ]},
-  {name:"French", faculty:"Faculty of Arts", merit:60.225, catchment:{Lagos:59.65},
+  {name:"French", faculty:"Faculty of Arts", merit:60.225, meritPrev:58.425, catchment:{Lagos:59.65},
    utme:["English Language","+3 Arts/Social"],
    utmeReqs:req.utmeArts,
    requirements:[
@@ -409,7 +410,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 Arts/Social Sciences",subjects:uniq([...ARTS_SOCIAL,"Civic Education","Computer Studies"]),count:3},
    ]},
-  {name:"Russian", faculty:"Faculty of Arts", merit:0, catchment:{},
+  {name:"Russian", faculty:"Faculty of Arts", merit:58.775, meritPrev:54.125, catchment:{},
    utme:["English Language","+3 Arts/Social"],
    utmeReqs:req.utmeArts,
    requirements:[
@@ -417,7 +418,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 Arts/Social Sciences",subjects:uniq([...ARTS_SOCIAL,"Civic Education","Computer Studies"]),count:3},
    ]},
-  {name:"German", faculty:"Faculty of Arts", merit:0, catchment:{},
+  {name:"German", faculty:"Faculty of Arts", merit:60.95, meritPrev:50.3, catchment:{},
    utme:["English Language","+3 Arts/Social"],
    utmeReqs:req.utmeArts,
    requirements:[
@@ -425,7 +426,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 Arts/Social Sciences",subjects:uniq([...ARTS_SOCIAL,"Civic Education","Computer Studies"]),count:3},
    ]},
-  {name:"Chinese", faculty:"Faculty of Arts", merit:0, catchment:{},
+  {name:"Chinese", faculty:"Faculty of Arts", merit:68.95, meritPrev:70.1, catchment:{},
    utme:["English Language","+3 Arts/Social"],
    utmeReqs:req.utmeArts,
    requirements:[
@@ -433,7 +434,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 Arts/Social Sciences",subjects:uniq([...ARTS_SOCIAL,"Civic Education","Computer Studies"]),count:3},
    ]},
-  {name:"Linguistics", faculty:"Faculty of Arts", merit:72.55, catchment:{Ekiti:67.425,Lagos:70.9,Ogun:71.375,Ondo:68.725,Osun:66.75,Oyo:68.325},
+  {name:"Linguistics", faculty:"Faculty of Arts", merit:72.55, meritPrev:66.675, catchment:{Ekiti:67.425,Lagos:70.9,Ogun:71.375,Ondo:68.725,Osun:66.75,Oyo:68.325},
    utme:["English Language","+3 Arts/Science/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:ARTS_SCIENCE_SOCIAL,count:3,label:"Arts / Science / Social Sciences"}],
    requirements:[
@@ -449,7 +450,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 of Arts/Science/Social Sciences",subjects:ARTS_SCIENCE_SOCIAL,count:3},
    ]},
-  {name:"Yoruba", faculty:"Faculty of Arts", merit:0, catchment:{},
+  {name:"Yoruba", faculty:"Faculty of Arts", merit:64.1, meritPrev:60.675, catchment:{},
    utme:["English Language","+3 Arts/Science/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:ARTS_SCIENCE_SOCIAL,count:3,label:"Arts / Science / Social Sciences"}],
    requirements:[
@@ -457,7 +458,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"3 of Arts/Science/Social Sciences",subjects:ARTS_SCIENCE_SOCIAL,count:3},
    ]},
-  {name:"Christian Religious Studies", faculty:"Faculty of Arts", merit:54.625, catchment:{},
+  {name:"Christian Religious Studies", faculty:"Faculty of Arts", merit:54.625, meritPrev:53.9, catchment:{},
    utme:["English Language","CRS","+2 subjects"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Christian Religious Studies"],count:1},{subjects:["Literature-in-English","History","Government","French","Yoruba","Igbo","Hausa","Visual Arts","Economics","Commerce"],count:2}],
    requirements:[
@@ -466,7 +467,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Christian Religious Studies",subjects:["Christian Religious Studies"],count:1},
     {label:"2 subjects",subjects:["__ANY__"],count:2},
    ]},
-  {name:"Islamic Studies", faculty:"Faculty of Arts", merit:54.675, catchment:{},
+  {name:"Islamic Studies", faculty:"Faculty of Arts", merit:54.675, meritPrev:51, catchment:{},
    utme:["English Language","Islamic Studies","+2 subjects"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Islamic Religious Studies"],count:1},{subjects:["Literature-in-English","History","Government","French","Yoruba","Igbo","Visual Arts","Economics","Commerce"],count:2}],
    requirements:[
@@ -477,7 +478,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // SOCIAL SCIENCES — O/Level + UTME from official 2025/2026 requirements
-  {name:"Economics", faculty:"Faculty of Social Sciences", merit:73.475, catchment:{Ekiti:54.925,Lagos:66.575,Ogun:71.575,Ondo:63.625,Osun:65.45,Oyo:66.125},
+  {name:"Economics", faculty:"Faculty of Social Sciences", merit:73.475, meritPrev:71.65, catchment:{Ekiti:54.925,Lagos:66.575,Ogun:71.575,Ondo:63.625,Osun:65.45,Oyo:66.125},
    utme:["English Language","Mathematics","Economics","+1 subject"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["__ANY__"],count:1}],
    requirements:[
@@ -486,7 +487,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"2 subjects",subjects:["__ANY__"],count:2},
    ]},
-  {name:"Mass Communication", faculty:"Faculty of Social Sciences", merit:74.074, catchment:{Ekiti:69.625,Lagos:71.8,Ogun:72.6,Ondo:70.65,Osun:70.825,Oyo:70.45},
+  {name:"Mass Communication", faculty:"Faculty of Social Sciences", merit:74.074, meritPrev:73.45, catchment:{Ekiti:69.625,Lagos:71.8,Ogun:72.6,Ondo:70.65,Osun:70.825,Oyo:70.45},
    utme:["English Language","Literature-in-English","+2 Arts/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Literature-in-English"],count:1},{subjects:ARTS_SOCIAL,count:2,label:"Arts / Social Sciences"}],
    requirements:[
@@ -495,7 +496,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Literature-in-English",subjects:["Literature-in-English"],count:1},
     {label:"2 electives",subjects:["Economics","History","Government","Geography","Yoruba","Igbo","Hausa","Arabic","Christian Religious Studies","Islamic Religious Studies","Civic Education"],count:2},
    ]},
-  {name:"Political Science", faculty:"Faculty of Social Sciences", merit:68.15, catchment:{Ekiti:58.325,Lagos:62.75,Ogun:64.275,Ondo:58.75,Osun:52.075,Oyo:60.9},
+  {name:"Political Science", faculty:"Faculty of Social Sciences", merit:68.15, meritPrev:66.85, catchment:{Ekiti:58.325,Lagos:62.75,Ogun:64.275,Ondo:58.75,Osun:52.075,Oyo:60.9},
    utme:["English Language","Government","Economics/Geography","+1 subject"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Government"],count:1},{subjects:["Economics","Geography"],count:1},{subjects:["History","Literature-in-English","Christian Religious Studies","Islamic Religious Studies"],count:1}],
    requirements:[
@@ -505,7 +506,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics or Geography",subjects:["Economics","Geography"],count:1},
     {label:"1 of History / Literature / CRS / IRS",subjects:["History","Literature-in-English","Christian Religious Studies","Islamic Religious Studies"],count:1},
    ]},
-  {name:"Psychology", faculty:"Faculty of Social Sciences", merit:69.7, catchment:{Ekiti:61.975,Lagos:65.95,Ogun:68.675,Ondo:63.05,Osun:55.75,Oyo:67.825},
+  {name:"Psychology", faculty:"Faculty of Social Sciences", merit:69.7, meritPrev:69.825, catchment:{Ekiti:61.975,Lagos:65.95,Ogun:68.675,Ondo:63.05,Osun:55.75,Oyo:67.825},
    utme:["English Language","+3 subjects"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics","Biology","Physics","Chemistry","Economics","Government","Literature-in-English"],count:3}],
    requirements:[
@@ -514,7 +515,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Biology",subjects:["Biology"],count:1},
     {label:"2 subjects (Social/Arts/Science)",subjects:PSYCH_POOL,count:2},
    ]},
-  {name:"Public Administration", faculty:"Faculty of Social Sciences", merit:74.2, catchment:{Ekiti:63.025,Lagos:68.475,Ogun:73.475,Ondo:69.625,Osun:70.25,Oyo:72.05},
+  {name:"Public Administration", faculty:"Faculty of Social Sciences", merit:74.2, meritPrev:68.4, catchment:{Ekiti:63.025,Lagos:68.475,Ogun:73.475,Ondo:69.625,Osun:70.25,Oyo:72.05},
    utme:["English Language","Government/Civic/History","Economics","+1 Arts/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Government","Civic Education","History"],count:1},{subjects:["Economics"],count:1},{subjects:ARTS_SOCIAL,count:1,label:"Arts / Social Sciences"}],
    requirements:[
@@ -524,7 +525,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"1 Arts/Social Sciences",subjects:ARTS_SOCIAL,count:1},
    ]},
-  {name:"Sociology", faculty:"Faculty of Social Sciences", merit:68.275, catchment:{Lagos:64.175,Ogun:66.875,Ondo:63.8,Osun:57,Oyo:65.95},
+  {name:"Sociology", faculty:"Faculty of Social Sciences", merit:68.275, meritPrev:66.575, catchment:{Lagos:64.175,Ogun:66.875,Ondo:63.8,Osun:57,Oyo:65.95},
    utme:["English Language","+2 Social Sciences","+1 Arts"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:SOCIAL_SUBS,count:2,label:"Social Sciences"},{subjects:ARTS_SUBS,count:1,label:"Arts"}],
    requirements:[
@@ -533,7 +534,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"2 Social Sciences",subjects:["Economics","Government","History","Civic Education","Geography"],count:2},
     {label:"1 Arts subject",subjects:["Literature-in-English","Christian Religious Studies","Islamic Religious Studies","Yoruba","Igbo","Hausa","French"],count:1},
    ]},
-  {name:"Social Work", faculty:"Faculty of Social Sciences", merit:67.35, catchment:{Ekiti:59.725,Lagos:55.15,Ogun:66.025,Ondo:60.575,Osun:63,Oyo:52.125},
+  {name:"Social Work", faculty:"Faculty of Social Sciences", merit:67.35, meritPrev:68.575, catchment:{Ekiti:59.725,Lagos:55.15,Ogun:66.025,Ondo:60.575,Osun:63,Oyo:52.125},
    utme:["English Language","+2 Social Sciences","+1 Arts"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:SOCIAL_SUBS,count:2,label:"Social Sciences"},{subjects:ARTS_SUBS,count:1,label:"Arts"}],
    requirements:[
@@ -542,7 +543,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"2 Social Sciences",subjects:["Economics","Government","History","Civic Education","Geography"],count:2},
     {label:"1 Arts / Religion / Biology",subjects:["Literature-in-English","Christian Religious Studies","Islamic Religious Studies","Yoruba","Igbo","Hausa","French","Biology"],count:1},
    ]},
-  {name:"Geography", faculty:"Faculty of Social Sciences", merit:57.475, catchment:{},
+  {name:"Geography", faculty:"Faculty of Social Sciences", merit:57.475, meritPrev:55.6, catchment:{},
    utme:["English Language","Geography","+2 Science/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Geography"],count:1},{subjects:["Biology","Chemistry","Physics","Economics","Government","Mathematics"],count:2}],
    requirements:[
@@ -551,7 +552,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Geography",subjects:["Geography"],count:1},
     {label:"2 Science/Social Sciences",subjects:SCIENCE_SOCIAL,count:2},
    ]},
-  {name:"Meteorology & Climate Science", faculty:"Faculty of Social Sciences", merit:0, catchment:{},
+  {name:"Meteorology & Climate Science", faculty:"Faculty of Social Sciences", merit:57.475, meritPrev:50.15, catchment:{},
    utme:["English Language","Mathematics","Physics","+1 Science"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Physics"],count:1},{subjects:["Geography","Chemistry","Biology","Agricultural Science"],count:1}],
    requirements:[
@@ -560,7 +561,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"2 of Geography/Chemistry/Biology/Agric/Further Maths/Computer/Data Processing",subjects:["Geography","Chemistry","Biology","Agricultural Science","Further Mathematics","Computer Studies","Data Processing"],count:2},
    ]},
-  {name:"Library & Information Science", faculty:"Faculty of Social Sciences", merit:66.625, catchment:{Lagos:62.95,Ogun:63.3,Ondo:61.225,Osun:60.85,Oyo:66.55},
+  {name:"Library & Information Science", faculty:"Faculty of Social Sciences", merit:66.625, meritPrev:66.25, catchment:{Lagos:62.95,Ogun:63.3,Ondo:61.225,Osun:60.85,Oyo:66.55},
    utme:["English Language","Literature-in-English","+2 Arts/Social"],
    utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Literature-in-English"],count:1},{subjects:ARTS_SOCIAL,count:2,label:"Arts / Social Sciences"}],
    requirements:[
@@ -579,7 +580,7 @@ export const PROGRAMMES: Programme[] = [
    ]},
 
   // ENVIRONMENTAL SCIENCES
-  {name:"Architecture", faculty:"Faculty of Environmental Sciences", merit:75.575, catchment:{Ekiti:60.725,Lagos:72.025,Ogun:72.15,Ondo:70.35,Osun:72.175,Oyo:72.825}, utme:["English Language","Mathematics","Physics","any"], utmeReqs:req.utmeEnvPhysics,
+  {name:"Architecture", faculty:"Faculty of Environmental Sciences", merit:75.575, meritPrev:75.1, catchment:{Ekiti:60.725,Lagos:72.025,Ogun:72.15,Ondo:70.35,Osun:72.175,Oyo:72.825}, utme:["English Language","Mathematics","Physics","any"], utmeReqs:req.utmeEnvPhysics,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -595,7 +596,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Chemistry",subjects:["Chemistry"],count:1},
     {label:"Best 1 elective",subjects:["Building Construction","Technical Drawing","Economics"],count:1},
    ]},
-  {name:"Estate Management", faculty:"Faculty of Environmental Sciences", merit:57.325, catchment:{Ekiti:53.05,Ogun:51.15,Osun:51.2}, utme:["English Language","Mathematics","Economics","any"], utmeReqs:req.utmeEnvEcon,
+  {name:"Estate Management", faculty:"Faculty of Environmental Sciences", merit:57.325, meritPrev:59.3, catchment:{Ekiti:53.05,Ogun:51.15,Osun:51.2}, utme:["English Language","Mathematics","Economics","any"], utmeReqs:req.utmeEnvEcon,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -603,14 +604,14 @@ export const PROGRAMMES: Programme[] = [
     {label:"Chemistry or Physics",subjects:["Chemistry","Physics"],count:1},
     {label:"Best 1 elective",subjects:["Biology","Geography","Agricultural Science","Technical Drawing","Fine Arts","Financial Accounting"],count:1},
    ]},
-  {name:"Quantity Surveying", faculty:"Faculty of Environmental Sciences", merit:64.3, catchment:{Ekiti:56.3,Lagos:56.75,Ogun:54.825,Ondo:59.625}, utme:["English Language","Mathematics","Physics","any"], utmeReqs:req.utmeEnvPhysics,
+  {name:"Quantity Surveying", faculty:"Faculty of Environmental Sciences", merit:64.3, meritPrev:67.9, catchment:{Ekiti:56.3,Lagos:56.75,Ogun:54.825,Ondo:59.625}, utme:["English Language","Mathematics","Physics","any"], utmeReqs:req.utmeEnvPhysics,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Best 2 electives",subjects:["Geography","Chemistry","Technical Drawing","Economics"],count:2},
    ]},
-  {name:"Urban & Regional Planning", faculty:"Faculty of Environmental Sciences", merit:53.5, catchment:{}, utme:["English Language","Mathematics","Geography/Economics","+1"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Geography","Economics"],count:1},{subjects:["Chemistry","Physics","Biology","Fine Arts","Technical Drawing"],count:1}],
+  {name:"Urban & Regional Planning", faculty:"Faculty of Environmental Sciences", merit:53.5, meritPrev:52.85, catchment:{}, utme:["English Language","Mathematics","Geography/Economics","+1"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Geography","Economics"],count:1},{subjects:["Chemistry","Physics","Biology","Fine Arts","Technical Drawing"],count:1}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},

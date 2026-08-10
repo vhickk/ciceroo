@@ -153,6 +153,9 @@ export type Band =
 
 export type Chance = 'high' | 'med' | 'low' | 'none' | 'unknown';
 
+// Safety rating from the 2-year cut-off pattern (needs a prior-year figure).
+export type Safety = 'safe' | 'likely' | 'borderline' | 'risky' | 'unknown';
+
 export interface Analysis {
   prog: Programme;
   utmeContrib: number; // /50
@@ -166,6 +169,11 @@ export interface Analysis {
   cutLabel: string;
   margin: number | null; // aggregate − cut-off (null if no cut-off data)
   admitted: boolean; // aggregate clears the cut-off
+  // ── 2-year trend / safety prediction (present only when meritPrev exists) ──
+  meritPrev: number | null; // prior-year (2024/25) merit cut-off
+  trendDelta: number | null; // merit − meritPrev (rising if > 0)
+  prevCut: number | null; // prior-year cut-off adjusted to the student's catchment
+  safety: Safety; // where the aggregate lands vs BOTH years
   band: Band;
   chance: Chance;
   utmeOk: boolean;
@@ -229,7 +237,30 @@ export function analyseProgramme(
     else band = 'far';
   }
 
+  // ── 2-year trend + safety band ──
+  const meritPrev = prog.meritPrev ?? null;
+  let trendDelta: number | null = null;
+  let prevCut: number | null = null;
+  let safety: Safety = 'unknown';
+  if (merit > 0 && meritPrev !== null) {
+    trendDelta = +(merit - meritPrev).toFixed(2);
+    // discount the prior-year merit by the same catchment relief the student
+    // gets this year, so both years compare on the student's own bar.
+    const catchDiscount = catchmentScore !== null ? Math.max(0, merit - catchmentScore) : 0;
+    prevCut = +Math.max(0, meritPrev - catchDiscount).toFixed(2);
+    const hi = Math.max(prevCut, primaryCut!);
+    const lo = Math.min(prevCut, primaryCut!);
+    if (aggregate >= hi + 3) safety = 'safe';
+    else if (aggregate >= hi) safety = 'likely';
+    else if (aggregate >= lo) safety = 'borderline';
+    else safety = 'risky';
+  }
+
   return {
+    meritPrev,
+    trendDelta,
+    prevCut,
+    safety,
     prog,
     utmeContrib,
     olevelPts,
