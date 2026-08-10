@@ -539,21 +539,6 @@ export function generateFullReportPDF(
   const postUtmeContrib = Math.max(0, Math.min(parseFloat(input.postUtme) || 0, 30));
   const totalCourses = sortedFaculties.reduce((s, f) => s + grouped[f].length, 0);
 
-  // Format a requirement group list into readable text.
-  const fmt = (groups: { subjects: string[]; count: number; label?: string }[]) =>
-    groups
-      .map((g) => {
-        if (g.subjects.includes('__ANY__'))
-          return g.label
-            ? `${g.count} of ${g.label}`
-            : `${g.count} free elective${g.count > 1 ? 's' : ''}`;
-        if (g.count >= g.subjects.length) return g.subjects.join(' + ');
-        const list = g.subjects.slice(0, 6).join(' / ');
-        const more = g.subjects.length > 6 ? ` +${g.subjects.length - 6}` : '';
-        return `${g.count} of (${list}${more})`;
-      })
-      .join(', ');
-
   const drawHeader = () => {
     doc.setFillColor(...teal);
     doc.rect(0, 0, W, 30, 'F');
@@ -604,19 +589,14 @@ export function generateFullReportPDF(
   );
 
   let y = 64;
-  const bottom = 285;
+  const bottom = 282;
+  const cardW = 91;
+  const cardH = 34;
+  const gapX = 6;
+  const gapY = 5;
+  const colX = [12, 12 + cardW + gapX];
 
-  sortedFaculties.forEach((fac, fi) => {
-    const items = grouped[fac];
-    const accent = COURSE_PDF[fi % COURSE_PDF.length];
-    // space for section header + at least one row
-    if (y + 22 > bottom) {
-      doc.addPage();
-      drawHeader();
-      y = 40;
-    }
-
-    // faculty section header
+  const drawFacHeader = (fac: string, accent: [number, number, number], items: AltItem[]) => {
     doc.setFillColor(...accent);
     doc.roundedRect(12, y, W - 24, 9, 2, 2, 'F');
     doc.setTextColor(255, 255, 255);
@@ -632,51 +612,81 @@ export function generateFullReportPDF(
       { align: 'right' },
     );
     y += 13;
+  };
+
+  const drawCard = (x: number, it: AltItem, i: number, accent: [number, number, number]) => {
+    const a = analyseProgramme(it.prog, input, studentResults);
+    const band = BAND_PDF[it.band];
+    const cut = a.primaryCut !== null ? `${a.primaryCut}` : '-';
+    // coloured tip + white body
+    doc.setFillColor(...accent);
+    doc.roundedRect(x, y, cardW, cardH, 2.6, 2.6, 'F');
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(232, 236, 242);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(x, y + 4, cardW, cardH - 4, 2.6, 2.6, 'FD');
+    const px = x + 7;
+    const pr = x + cardW - 7;
+    // rank + verdict
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(160, 170, 185);
+    doc.text(`#${i + 1}`, px, y + 11);
+    doc.setTextColor(...band.rgb);
+    doc.setFontSize(7);
+    doc.text(band.label.toUpperCase(), pr, y + 11, { align: 'right' });
+    // course name (up to 2 lines)
+    doc.setTextColor(17, 24, 39);
+    doc.setFontSize(10.5);
+    const nameLines = (doc.splitTextToSize(it.prog.name, cardW - 14) as string[]).slice(0, 2);
+    doc.text(nameLines[0], px, y + 18);
+    if (nameLines[1]) doc.text(nameLines[1], px, y + 22.5);
+    // O/Level counted
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`O/Level counted: ${it.olevelPts.toFixed(1)} / 20`, px, y + 27.5);
+    // aggregate + cut-off
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...accent);
+    const agg = it.aggregate.toFixed(1);
+    doc.text(agg, px, y + 32.5);
+    const aw = doc.getTextWidth(agg);
+    doc.setFontSize(7.5);
+    doc.setTextColor(160, 170, 185);
+    doc.text('/100', px + aw + 1.4, y + 32.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(120, 130, 145);
+    doc.text(`cut ${cut}`, pr, y + 32.5, { align: 'right' });
+  };
+
+  sortedFaculties.forEach((fac, fi) => {
+    const items = grouped[fac];
+    const accent = COURSE_PDF[fi % COURSE_PDF.length];
+    // keep a header + at least one card row together
+    if (y + 13 + cardH > bottom) {
+      doc.addPage();
+      drawHeader();
+      y = 40;
+    }
+    drawFacHeader(fac, accent, items);
 
     items.forEach((it, i) => {
-      if (y + 12 > bottom) {
-        doc.addPage();
-        drawHeader();
-        y = 40;
+      const col = i % 2;
+      if (col === 0) {
+        if (i > 0) y += cardH + gapY;
+        if (y + cardH > bottom) {
+          doc.addPage();
+          drawHeader();
+          y = 40;
+          drawFacHeader(fac, accent, items);
+        }
       }
-      const a = analyseProgramme(it.prog, input, studentResults);
-      const band = BAND_PDF[it.band];
-      const cut = a.primaryCut !== null ? `${a.primaryCut}` : '-';
-
-      // rank + course name
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(17, 24, 39);
-      const nm = (doc.splitTextToSize(`${i + 1}. ${it.prog.name}`, 120) as string[])[0];
-      doc.text(nm, 16, y);
-
-      // aggregate / cut-off / verdict (right)
-      doc.setFontSize(9);
-      doc.setTextColor(...accent);
-      doc.text(`${it.aggregate.toFixed(1)}/100`, 150, y, { align: 'right' });
-      doc.setTextColor(120, 130, 145);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.text(`cut ${cut}`, 168, y, { align: 'right' });
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(...band.rgb);
-      doc.text(band.label.toUpperCase(), W - 16, y, { align: 'right' });
-
-      // requirement sub-lines
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(120, 130, 145);
-      const utmeLine = (doc.splitTextToSize(`UTME: ${fmt(it.prog.utmeReqs)}`, W - 34) as string[])[0];
-      doc.text(utmeLine, 20, y + 4);
-      const olLine = (doc.splitTextToSize(`O/Level: ${fmt(it.prog.requirements)}`, W - 34) as string[])[0];
-      doc.text(olLine, 20, y + 7.6);
-
-      y += 11;
-      doc.setDrawColor(241, 245, 249);
-      doc.line(16, y - 1.5, W - 16, y - 1.5);
+      drawCard(colX[col], it, i, accent);
     });
-    y += 4;
+    y += cardH + 9;
   });
 
   // footer note on last page
