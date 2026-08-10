@@ -208,7 +208,7 @@ export function StepProgramme({
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search 90+ programmes…"
+              placeholder="Search 100 programmes…"
               className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-300"
             />
           </div>
