@@ -146,6 +146,12 @@ req.utmeEnvEcon    = [{subjects:["English Language"],count:1},{subjects:["Mathem
 req.utmeBioAny     = [{subjects:["English Language"],count:1},{subjects:["Biology"],count:1},{subjects:["__ANY__"],count:2}];
 req.utmeChem2Any   = [{subjects:["English Language"],count:1},{subjects:["Chemistry"],count:1},{subjects:["Biology","__ANY__"],count:1},{subjects:["__ANY__"],count:1}];
 req.utmeOpen       = [{subjects:["English Language"],count:1},{subjects:["__ANY__"],count:3}];
+// Education subject-teaching UTME requirements (must include the teaching subject)
+req.utmeBioEd      = [{subjects:["English Language"],count:1},{subjects:["Biology"],count:1},{subjects:["Chemistry","Mathematics","Physics"],count:2}];
+req.utmeChemEd     = [{subjects:["English Language"],count:1},{subjects:["Chemistry"],count:1},{subjects:["Physics","Biology","Agricultural Science","Integrated Science"],count:2}];
+req.utmePhysEd     = [{subjects:["English Language"],count:1},{subjects:["Physics"],count:1},{subjects:["Mathematics","Chemistry"],count:1},{subjects:["Biology","Agricultural Science"],count:1}];
+req.utmeIntSciEd   = [{subjects:["English Language"],count:1},{subjects:["Biology"],count:1},{subjects:["Chemistry","Physics","Mathematics","Agricultural Science"],count:2}];
+req.utmeEconEd     = [{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:["Geography","History","Government","Literature-in-English"],count:1}];
 
 export const PROGRAMMES: Programme[] = [
   // COLLEGE OF MEDICINE
@@ -578,7 +584,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Best 2 electives",subjects:["Chemistry","Biology","Agricultural Science","Further Mathematics","Computer Studies"],count:2},
    ]},
-  {name:"Biology Education", faculty:"Faculty of Education", merit:53.5, catchment:{}, utme:["English Language","Biology","Chemistry","any"], utmeReqs:req.utmeBioAny,
+  {name:"Biology Education", faculty:"Faculty of Education", merit:53.5, catchment:{}, utme:["English Language","Biology","+2 of Chemistry/Maths/Physics"], utmeReqs:req.utmeBioEd,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Biology",subjects:["Biology"],count:1},
@@ -586,14 +592,14 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Best 1 elective",subjects:["Physics","Agricultural Science","Health Science"],count:1},
    ]},
-  {name:"Chemistry Education", faculty:"Faculty of Education", merit:53.875, catchment:{}, utme:["English Language","Chemistry","any"], utmeReqs:req.utmeChem2Any,
+  {name:"Chemistry Education", faculty:"Faculty of Education", merit:53.875, catchment:{}, utme:["English Language","Chemistry","+2 Science"], utmeReqs:req.utmeChemEd,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Chemistry",subjects:["Chemistry"],count:1},
     {label:"Best 2 electives",subjects:["Physics","Biology","Agricultural Science","Integrated Science"],count:2},
    ]},
-  {name:"Physics Education", faculty:"Faculty of Education", merit:63, catchment:{}, utme:["English Language","Physics","Chemistry","any"], utmeReqs:req.utmeEnvPhysics,
+  {name:"Physics Education", faculty:"Faculty of Education", merit:63, catchment:{}, utme:["English Language","Physics","Maths/Chemistry","+1 Science"], utmeReqs:req.utmePhysEd,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -608,14 +614,14 @@ export const PROGRAMMES: Programme[] = [
     {label:"Physics",subjects:["Physics"],count:1},
     {label:"Best 2 electives",subjects:["Technical Drawing","Chemistry","Biology","Computer Studies","Further Mathematics"],count:2},
    ]},
-  {name:"Economics Education", faculty:"Faculty of Education", merit:56.175, catchment:{}, utme:["English Language","Mathematics","Economics","any"], utmeReqs:req.utmeSocial,
+  {name:"Economics Education", faculty:"Faculty of Education", merit:56.175, catchment:{}, utme:["English Language","Mathematics","Economics","+1"], utmeReqs:req.utmeEconEd,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Economics",subjects:["Economics"],count:1},
     {label:"Best 2 electives",subjects:["Geography","History","Government","Literature-in-English","Financial Accounting","Civic Education"],count:2},
    ]},
-  {name:"Business Education", faculty:"Faculty of Education", merit:59.65, catchment:{Lagos:55.425,Ogun:56.425,Osun:56.6,Oyo:52.575}, utme:["English Language","Mathematics","Economics","any"], utmeReqs:req.utmeSocial,
+  {name:"Business Education", faculty:"Faculty of Education", merit:59.65, catchment:{Lagos:55.425,Ogun:56.425,Osun:56.6,Oyo:52.575}, utme:["English Language","Mathematics","Economics","+1 Arts/Social"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Mathematics"],count:1},{subjects:["Economics"],count:1},{subjects:ARTS_SOCIAL,count:1,label:"Arts / Social Sciences"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -628,7 +634,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Best 3 from any",subjects:["__ANY__"],count:3},
    ]},
-  {name:"Geography Education", faculty:"Faculty of Education", merit:0, catchment:{}, utme:["English Language","Geography","any"], utmeReqs:req.utmeOpen,
+  {name:"Geography Education", faculty:"Faculty of Education", merit:0, catchment:{}, utme:["English Language","Geography","+2 Science/Social"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Geography"],count:1},{subjects:SCIENCE_SOCIAL,count:2,label:"Science / Social Sciences"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -642,7 +648,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"History or Government",subjects:["History","Government"],count:1},
     {label:"Best 2 Arts/Social Sciences",subjects:["__ANY__"],count:2},
    ]},
-  {name:"Human Kinetics & Health Education", faculty:"Faculty of Education", merit:53.35, catchment:{}, utme:["English Language","Biology","any"], utmeReqs:req.utmeBioAny,
+  {name:"Human Kinetics & Health Education", faculty:"Faculty of Education", merit:53.35, catchment:{}, utme:["English Language","Biology","+2 Science"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Biology","Health Science","Physical Education"],count:1},{subjects:["Physics","Chemistry","Agricultural Science","Further Mathematics","Integrated Science","Health Education","Mathematics"],count:2}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -668,14 +674,14 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Best 3 from pool",subjects:["Literature-in-English","Geography","Economics","History","Government","Yoruba","Igbo","Christian Religious Studies","Islamic Religious Studies","French","Civic Education"],count:3},
    ]},
-  {name:"CRS Education", faculty:"Faculty of Education", merit:56.275, catchment:{}, utme:["English Language","any"], utmeReqs:req.utmeArts,
+  {name:"CRS Education", faculty:"Faculty of Education", merit:56.275, catchment:{}, utme:["English Language","CRS","+2 subjects"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Christian Religious Studies"],count:1},{subjects:["History","Government","French","Yoruba","Igbo","Hausa","Geography","Mathematics","Economics","Commerce"],count:2}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Christian Religious Studies",subjects:["Christian Religious Studies"],count:1},
     {label:"Best 2 electives",subjects:["Literature-in-English","Yoruba","Igbo","History","Government","French","Economics","Commerce","Geography","Civic Education","Social Studies"],count:2},
    ]},
-  {name:"IRS/Islamic Studies Education", faculty:"Faculty of Education", merit:56.125, catchment:{}, utme:["English Language","any"], utmeReqs:req.utmeArts,
+  {name:"IRS/Islamic Studies Education", faculty:"Faculty of Education", merit:56.125, catchment:{}, utme:["English Language","Islamic Studies","+2 subjects"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Islamic Religious Studies"],count:1},{subjects:["Literature-in-English","History","Government","French","Arabic","Yoruba","Igbo","Christian Religious Studies","Economics","Commerce","Geography","Mathematics"],count:2}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -694,14 +700,14 @@ export const PROGRAMMES: Programme[] = [
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"Best 3 from any",subjects:["__ANY__"],count:3},
    ]},
-  {name:"French Education", faculty:"Faculty of Education", merit:59.3, catchment:{}, utme:["English Language","French","any"], utmeReqs:req.utmeArts,
+  {name:"French Education", faculty:"Faculty of Education", merit:59.3, catchment:{}, utme:["English Language","French","+2 Arts/Social"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["French"],count:1},{subjects:ARTS_SOCIAL,count:2,label:"Arts / Social Sciences"}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
     {label:"French",subjects:["French"],count:1},
     {label:"Best 2 Arts/Social Sciences",subjects:["History","Government","Literature-in-English","Economics","Geography","Christian Religious Studies","Islamic Religious Studies","Yoruba","Igbo","Civic Education"],count:2},
    ]},
-  {name:"Integrated Science Education", faculty:"Faculty of Education", merit:56.1, catchment:{}, utme:["English Language","Chemistry","Biology","any"], utmeReqs:req.utmeChem2Any,
+  {name:"Integrated Science Education", faculty:"Faculty of Education", merit:56.1, catchment:{}, utme:["English Language","Biology","+2 Science"], utmeReqs:req.utmeIntSciEd,
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
@@ -709,7 +715,7 @@ export const PROGRAMMES: Programme[] = [
     {label:"Biology",subjects:["Biology"],count:1},
     {label:"Best 1 elective",subjects:["Agricultural Science","Integrated Science","Physics"],count:1},
    ]},
-  {name:"Education Home Economics", faculty:"Faculty of Education", merit:58.125, catchment:{}, utme:["English Language","any"], utmeReqs:req.utmeOpen,
+  {name:"Education Home Economics", faculty:"Faculty of Education", merit:58.125, catchment:{}, utme:["English Language","Chemistry","Biology/Agric","+1"], utmeReqs:[{subjects:["English Language"],count:1},{subjects:["Chemistry"],count:1},{subjects:["Biology","Agricultural Science"],count:1},{subjects:["Mathematics","Physics","Food & Nutrition","Home Economics","Economics"],count:1}],
    requirements:[
     {label:"English Language",subjects:["English Language"],count:1},
     {label:"Mathematics",subjects:["Mathematics"],count:1},
