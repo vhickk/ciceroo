@@ -28,7 +28,7 @@ import {
 } from '../lib/ui';
 import { Card } from './ui';
 import { CombinationCheck } from './ComboCheck';
-import { generateFacultyPDF } from '../lib/pdf';
+import { generateFacultyPDF, generateFullReportPDF } from '../lib/pdf';
 
 // ── Aggregate headline copy, shared by course card + detail ───────────────
 function aggCopy(a: Analysis): { big: string; sub: string } {
@@ -70,6 +70,8 @@ export function Alternatives({
 
   const downloadFaculty = (fac: string) =>
     generateFacultyPDF(name, input, studentResults, fac, grouped[fac] ?? []);
+  const downloadAll = () =>
+    generateFullReportPDF(name, input, studentResults, grouped, sortedFaculties);
 
   const goFaculties = () => {
     setCourse(null);
@@ -147,6 +149,7 @@ export function Alternatives({
               total={total}
               onPick={goCourses}
               onDownload={downloadFaculty}
+              onDownloadAll={downloadAll}
             />
           </motion.div>
         )}
@@ -182,12 +185,14 @@ function FacultiesView({
   total,
   onPick,
   onDownload,
+  onDownloadAll,
 }: {
   grouped: Record<string, AltItem[]>;
   sortedFaculties: string[];
   total: number;
   onPick: (fac: string) => void;
   onDownload: (fac: string) => void;
+  onDownloadAll: () => void;
 }) {
   if (total === 0) {
     return (
@@ -202,17 +207,25 @@ function FacultiesView({
 
   return (
     <div>
-      <div className="mb-5">
-        <div className="mb-1 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-teal-600">
-          <Layers className="h-4 w-4" /> Alternative faculties
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="mb-1 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-teal-600">
+            <Layers className="h-4 w-4" /> Alternative faculties
+          </div>
+          <h2 className="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
+            You may qualify for {total} other course{total !== 1 ? 's' : ''}
+          </h2>
+          <p className="mt-1 text-sm font-medium text-slate-500">
+            Explore by faculty. Tap a faculty to see its courses, then a course for the full
+            breakdown.
+          </p>
         </div>
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">
-          You may qualify for {total} other course{total !== 1 ? 's' : ''}
-        </h2>
-        <p className="mt-1 text-sm font-medium text-slate-500">
-          Explore by faculty. Tap a faculty to see its courses, then a course for the full
-          breakdown.
-        </p>
+        <button
+          onClick={onDownloadAll}
+          className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white shadow-lg transition hover:bg-slate-800"
+        >
+          <Download className="h-4 w-4" /> Download all faculties (PDF)
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-7">

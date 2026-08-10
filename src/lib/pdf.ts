@@ -517,3 +517,178 @@ export function generateFacultyPDF(
   )}_courses.pdf`;
   doc.save(filename);
 }
+
+// ── Merged report: every faculty the student qualifies for, one document ──
+export function generateFullReportPDF(
+  name: string,
+  input: StudentInput,
+  studentResults: OlevelEntry[],
+  grouped: Record<string, AltItem[]>,
+  sortedFaculties: string[],
+) {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210;
+  const teal: [number, number, number] = [13, 148, 136];
+  const today = new Date().toLocaleDateString('en-NG', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+  const utme = parseFloat(input.utmeScore) || 0;
+  const utmeContrib = Math.min(utme / 8, 50);
+  const postUtmeContrib = Math.max(0, Math.min(parseFloat(input.postUtme) || 0, 30));
+  const totalCourses = sortedFaculties.reduce((s, f) => s + grouped[f].length, 0);
+
+  // Format a requirement group list into readable text.
+  const fmt = (groups: { subjects: string[]; count: number; label?: string }[]) =>
+    groups
+      .map((g) => {
+        if (g.subjects.includes('__ANY__'))
+          return g.label
+            ? `${g.count} of ${g.label}`
+            : `${g.count} free elective${g.count > 1 ? 's' : ''}`;
+        if (g.count >= g.subjects.length) return g.subjects.join(' + ');
+        const list = g.subjects.slice(0, 6).join(' / ');
+        const more = g.subjects.length > 6 ? ` +${g.subjects.length - 6}` : '';
+        return `${g.count} of (${list}${more})`;
+      })
+      .join(', ');
+
+  const drawHeader = () => {
+    doc.setFillColor(...teal);
+    doc.rect(0, 0, W, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('Ciceroo', 14, 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(210, 244, 239);
+    doc.text('UNILAG 2025/2026 Admission Intelligence  |  by Skujy Tutorials', 14, 20);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(255, 255, 255);
+    doc.text('FULL ADMISSION REPORT', W - 14, 14, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(210, 244, 239);
+    doc.text(`Generated ${today}`, W - 14, 20, { align: 'right' });
+  };
+
+  drawHeader();
+
+  // Student summary
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...teal);
+  doc.text('STUDENT', 14, 40);
+  doc.setFontSize(16);
+  doc.setTextColor(17, 24, 39);
+  doc.text(name || 'Student', 14, 47.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    `UTME ${utme}/400 (${utmeContrib.toFixed(1)}/50)  |  Post-UTME ${postUtmeContrib.toFixed(1)}/30  |  ${input.stateOfOrigin || 'State not set'}`,
+    W - 14,
+    47.5,
+    { align: 'right' },
+  );
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(17, 24, 39);
+  doc.text(
+    `${totalCourses} course${totalCourses !== 1 ? 's' : ''} you qualify for, across ${sortedFaculties.length} facult${sortedFaculties.length !== 1 ? 'ies' : 'y'}`,
+    14,
+    56,
+  );
+
+  let y = 64;
+  const bottom = 285;
+
+  sortedFaculties.forEach((fac, fi) => {
+    const items = grouped[fac];
+    const accent = COURSE_PDF[fi % COURSE_PDF.length];
+    // space for section header + at least one row
+    if (y + 22 > bottom) {
+      doc.addPage();
+      drawHeader();
+      y = 40;
+    }
+
+    // faculty section header
+    doc.setFillColor(...accent);
+    doc.roundedRect(12, y, W - 24, 9, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(facShort(fac).toUpperCase(), 16, y + 6.2);
+    doc.setFontSize(8);
+    const inCount = items.filter((it) => it.admitted).length;
+    doc.text(
+      `${items.length} course${items.length !== 1 ? 's' : ''}  ·  ${inCount} you're in`,
+      W - 16,
+      y + 6.2,
+      { align: 'right' },
+    );
+    y += 13;
+
+    items.forEach((it, i) => {
+      if (y + 12 > bottom) {
+        doc.addPage();
+        drawHeader();
+        y = 40;
+      }
+      const a = analyseProgramme(it.prog, input, studentResults);
+      const band = BAND_PDF[it.band];
+      const cut = a.primaryCut !== null ? `${a.primaryCut}` : '-';
+
+      // rank + course name
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(17, 24, 39);
+      const nm = (doc.splitTextToSize(`${i + 1}. ${it.prog.name}`, 120) as string[])[0];
+      doc.text(nm, 16, y);
+
+      // aggregate / cut-off / verdict (right)
+      doc.setFontSize(9);
+      doc.setTextColor(...accent);
+      doc.text(`${it.aggregate.toFixed(1)}/100`, 150, y, { align: 'right' });
+      doc.setTextColor(120, 130, 145);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.text(`cut ${cut}`, 168, y, { align: 'right' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...band.rgb);
+      doc.text(band.label.toUpperCase(), W - 16, y, { align: 'right' });
+
+      // requirement sub-lines
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(120, 130, 145);
+      const utmeLine = (doc.splitTextToSize(`UTME: ${fmt(it.prog.utmeReqs)}`, W - 34) as string[])[0];
+      doc.text(utmeLine, 20, y + 4);
+      const olLine = (doc.splitTextToSize(`O/Level: ${fmt(it.prog.requirements)}`, W - 34) as string[])[0];
+      doc.text(olLine, 20, y + 7.6);
+
+      y += 11;
+      doc.setDrawColor(241, 245, 249);
+      doc.line(16, y - 1.5, W - 16, y - 1.5);
+    });
+    y += 4;
+  });
+
+  // footer note on last page
+  doc.setFontSize(7);
+  doc.setTextColor(148, 163, 184);
+  doc.text(
+    'Ciceroo  |  UNILAG Admission Intelligence by Skujy Tutorials  ·  Cut-offs from 2024/2025; verify at unilag.edu.ng  ·  Call 09069882502',
+    W / 2,
+    292,
+    { align: 'center' },
+  );
+
+  const filename = `Ciceroo_${(name || 'Student').replace(/\s+/g, '_')}_Full_Report.pdf`;
+  doc.save(filename);
+}
